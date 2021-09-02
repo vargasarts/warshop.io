@@ -1,10 +1,10 @@
 name: Publish Lambda
 on:
-push:
-  branches: main
-  paths:
-    - "lambdas/*"
-    - ".github/workflows/lambda.yaml"
+  push:
+    branches: main
+    paths:
+      - "lambdas/*"
+      - ".github/workflows/lambdas.yaml"
 
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.DEPLOY_AWS_ACCESS_KEY }}
