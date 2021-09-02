@@ -63,6 +63,7 @@ module "aws-serverless-backend" {
     api_name = "warshop-io"
     domain = "warshop.io"
     paths = [
+      "game/post"
     ]
 
     tags = {
