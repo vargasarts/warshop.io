@@ -70,11 +70,6 @@ module "aws-serverless-backend" {
     }
 }
 
-provider "github" {
-  owner = "dvargas92495"
-  token = var.github_token
-}
-
 resource "github_actions_secret" "deploy_aws_access_key" {
   repository       = "warshop.io"
   secret_name      = "DEPLOY_AWS_ACCESS_KEY"
