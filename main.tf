@@ -43,7 +43,7 @@ provider "github" {
 
 module "aws_static_site" {
   source  = "dvargas92495/static-site/aws"
-  version = "3.0.8"
+  version = "3.1.5"
 
   domain = "warshop.io"
   secret = var.secret
