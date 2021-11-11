@@ -30,6 +30,10 @@ variable "secret" {
   type = string
 }
 
+variable "clerk_api_key" {
+    type = string
+}
+
 provider "aws" {
   region = "us-east-1"
   access_key = var.aws_access_token
@@ -58,17 +62,9 @@ module "aws_static_site" {
 
 module "aws-serverless-backend" {
     source  = "dvargas92495/serverless-backend/aws"
-    version = "1.5.14"
+    version = "2.2.1"
 
     api_name = "warshop-io"
-    domain = "warshop.io"
-    paths = [
-      "game/post"
-    ]
-
-    tags = {
-        Application = "warshop-io"
-    }
 }
 
 resource "github_actions_secret" "deploy_aws_access_key" {
@@ -81,4 +77,21 @@ resource "github_actions_secret" "deploy_aws_access_secret" {
   repository       = "warshop.io"
   secret_name      = "DEPLOY_AWS_ACCESS_SECRET"
   plaintext_value  = module.aws_static_site.deploy-secret
+}
+resource "github_actions_secret" "lambda_aws_access_key" {
+  repository       = "${projectName}"
+  secret_name      = "LAMBDA_AWS_ACCESS_KEY"
+  plaintext_value  = module.aws-serverless-backend.access_key
+}
+
+resource "github_actions_secret" "lambda_aws_access_secret" {
+  repository       = "${projectName}"
+  secret_name      = "LAMBDA_AWS_ACCESS_SECRET"
+  plaintext_value  = module.aws-serverless-backend.secret_key
+}
+
+resource "github_actions_secret" "clerk_api_key" {
+  repository       = "${projectName}"
+  secret_name      = "CLERK_API_KEY"
+  plaintext_value  = var.clerk_api_key
 }

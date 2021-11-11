@@ -3,3 +3,11 @@ build
 dist
 out
 .env
+
+unity/Library
+unity/Temp
+**.csproj
+**.sln
+unity/[Ll]ogs/
+unity/obj
+unity/[Uu]ser[Ss]ettings/
