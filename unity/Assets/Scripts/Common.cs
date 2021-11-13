@@ -372,4 +372,11 @@ public class Messages {
     }
     public class CreateGameResponse : GameSessionResponse { }
     public class JoinGameResponse : GameSessionResponse { }
+
+    public class SocketMessageProps {}
+
+    public class SocketMessage {
+        public string name;
+        public SocketMessageProps props;
+    }
 }

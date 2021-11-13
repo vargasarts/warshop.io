@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+using WebSocketSharp;
 
 public class AwsGameClient : GameClient
 {
     private string ip;
     private int port;
     private string playerSessionId;
+    private WebSocket ws;
 
     internal AwsGameClient(string psid, string ipAddress, int p)
     {
@@ -21,16 +22,17 @@ public class AwsGameClient : GameClient
     {
         try
         {
-            /*
-            client = new NetworkClient();
-            short[] messageTypes = new short[] {
-                MsgType.Connect, MsgType.Disconnect, MsgType.Error, Messages.GAME_READY, Messages.TURN_EVENTS, Messages.WAITING_COMMANDS, Messages.SERVER_ERROR,
+            ws = new WebSocket("ws://" + ip + ":" + port);
+            ws.Connect();
+            ws.OnMessage += (sender, e) =>
+            {
+                Messages.SocketMessage message = JsonUtility.FromJson<Messages.SocketMessage>(e.Data);
+                switch(message.name) {
+                    default:
+                        Console.WriteLine(e.Data);
+                        return;
+                }
             };
-            messageTypes.ToList().ForEach(messageType => client.RegisterHandler(messageType, GetHandler(messageType)));
-            client.RegisterHandler(MsgType.Connect, OnConnect);
-            client.RegisterHandler(MsgType.Disconnect, OnDisconnect);
-            client.Connect(ip, port);
-            */
             Debug.Log("Attempting to connect to " + ip + ":" + port);
         }
         catch(Exception e)
@@ -40,37 +42,19 @@ public class AwsGameClient : GameClient
         }
     }
 
-    protected void Send(short msgType)//, MessageBase message)
-    {
-     //   client.Send(msgType, message);
-    }
-
-    protected string GetHandler(short messageType)
-    {
-        switch(messageType)
-        {
-            /*case MsgType.Connect:
-                return OnConnect;
-            case MsgType.Disconnect:
-                return OnDisconnect;*/
-            default:
-                return "";//NetworkMessageDelegate);
-        }
-    }
-
-    private void OnConnect()//NetworkMessage netMsg)
+    private void OnConnect()
     {
         Debug.Log("Connected");
 
         Messages.AcceptPlayerSessionMessage msg = new Messages.AcceptPlayerSessionMessage();
         msg.playerSessionId = playerSessionId;
-   //     Send(Messages.ACCEPT_PLAYER_SESSION, msg);
+        ws.Send(JsonUtility.ToJson(msg));
     }
 
-    private void OnDisconnect()//NetworkMessage netMsg)
+    private void OnDisconnect()
     {
         Debug.Log("Disconnected");
-        // client.Connect(ip, port);
+        ws.Connect();
     }
 
     internal void SendGameRequest(string[] myRobots, string myname, UnityAction<List<Robot>, List<Robot>, string, Map> readyCallback)
@@ -79,6 +63,6 @@ public class AwsGameClient : GameClient
         msg.myName = myname;
         msg.myRobots = myRobots;
         gameReadyCallback = readyCallback;
-    //    Send(Messages.START_GAME, msg);
+        ws.Send(JsonUtility.ToJson(msg));
     }
 }
