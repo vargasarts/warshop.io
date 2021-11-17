@@ -1,10 +1,9 @@
-import WebSocket from "ws";
+import WebSocket, {WebSocketServer} from "ws";
 import GameLiftServerAPI, {
   LogParameters,
   ProcessParameters,
 } from "@dplusic/gamelift-nodejs-serversdk";
 import { OnStartGameSessionDelegate } from "@dplusic/gamelift-nodejs-serversdk/dist/types/Server/ProcessParameters";
-import { PlayerSessionStatus } from "@dplusic/gamelift-nodejs-serversdk/dist/types/Server/Model/PlayerSessionStatus";
 import { createMap } from "./map";
 import { commandsToEvents, flip, Game, joinGame, storeCommands } from "./game";
 
@@ -40,13 +39,13 @@ const onHealthCheck = (): boolean => {
     GameSessionId: appgame.current.gameSessionId,
     Limit: 5,
   }).then((result) => {
-    let timedOut = result.Result.PlayerSessions.length > 0;
-    result.Result.PlayerSessions.forEach((ps) => {
-      timedOut = timedOut && ps.Status == PlayerSessionStatus.TIMEDOUT;
+    const sessions = result.Result?.PlayerSessions || [];
+    let timedOut = sessions.length > 0;
+    sessions.forEach((ps) => {
+      timedOut = timedOut && ps.Status === 4 // PlayerSessionStatus.TIMEDOUT;
     });
     if (timedOut) EndGame();
-    if (healthChecks == 10 && result.Result.PlayerSessions.length == 0)
-      EndGame();
+    if (healthChecks == 10 && sessions.length == 0) EndGame();
   });
   return true;
 };
@@ -90,7 +89,7 @@ const onStartGame = (
     name: myName,
     ws,
   });
-  if (appgame.current.primary.joined && appgame.current.secondary.joined) {
+  if (appgame.current.primary?.joined && appgame.current.secondary?.joined) {
     appgame.current.primary.ws.send(
       JSON.stringify({
         name: "GAME_READY",
@@ -108,16 +107,18 @@ const onStartGame = (
 
 const onSubmitCommands = (
   { owner, commands }: { owner: string; commands: unknown[] },
-  ws
+  ws: WebSocket
 ) => {
   console.log("Client Submitting Commands");
   try {
     const p =
-      appgame.current.primary.name === owner
+      appgame.current.primary?.name === owner
         ? appgame.current.primary
-        : appgame.current.secondary;
-    storeCommands(p, commands);
-    if (appgame.current.primary.ready && appgame.current.secondary.ready) {
+        : appgame.current.secondary?.name === owner
+        ? appgame.current.secondary
+        : null;
+      if (p) storeCommands(p, commands);
+    if (appgame.current.primary?.ready && appgame.current.secondary?.ready) {
       const events = commandsToEvents(appgame.current);
       const props = { events, turn: appgame.current.turn };
       appgame.current.primary.ws.send(
@@ -143,13 +144,13 @@ const onSubmitCommands = (
       exceptionType: e.name,
       exceptionMessage: e.message,
     };
-    appgame.current.primary.ws.send(
+    appgame.current.primary?.ws?.send?.(
       JSON.stringify({
         name: "SERVER_ERROR",
         props,
       })
     );
-    appgame.current.secondary.ws.send(
+    appgame.current.secondary?.ws?.send?.(
       JSON.stringify({
         name: "SERVER_ERROR",
         props,
@@ -169,7 +170,7 @@ const MESSAGE_HANDLERS = {
 type Message<T> = { name: keyof typeof MESSAGE_HANDLERS; props: T };
 
 if (outcome.Success) {
-  const wss = new WebSocket.Server({ port: PORT }, () => {
+  const wss = new WebSocketServer({ port: PORT }, () => {
     console.log("server started");
   });
   wss.on("connection", (ws) => {

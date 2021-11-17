@@ -1,55 +1,55 @@
-﻿using UnityEngine;
-using UnityEngine.UIElements;
+﻿using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine;
 
 public class InitialController : MonoBehaviour
 {
     public Button enterLobbyButton;
     public Button enterLocalMatchButton;
     public Button profileButton;
-    public TextField usernameField;
-    public Scene lobbyScene;
-    public Scene profileScene;
-    public Scene setupScene;
+    public InputField usernameField;
+    public SceneReference lobbyScene;
+    public SceneReference profileScene;
+    public SceneReference setupScene;
 
     void Start ()
     {
-        enterLobbyButton.clicked += EnterLobby;
-        enterLocalMatchButton.clicked += EnterLocalMatch;
-        profileButton.clicked += EnterProfile;
+        enterLobbyButton.onClick.AddListener(EnterLobby);
+        enterLocalMatchButton.onClick.AddListener(EnterLocalMatch);
+        profileButton.onClick.AddListener(EnterProfile);
 
-        usernameField.value = ProfileController.username;
+        usernameField.text = ProfileController.username;
         OnUsernameFieldEdit(usernameField.text);
-        usernameField.RegisterValueChangedCallback((e) => OnUsernameFieldEdit(e.newValue));
-        usernameField.Focus();
+        usernameField.onValueChanged.AddListener(OnUsernameFieldEdit);
+        usernameField.Select();
     }
 
     void OnUsernameFieldEdit(string newValue)
     {
         bool valid = !string.IsNullOrEmpty(newValue);
-        enterLobbyButton.SetEnabled(valid);
-        enterLocalMatchButton.SetEnabled(valid);
-        profileButton.SetEnabled(valid);
+        enterLobbyButton.interactable = valid;
+        enterLocalMatchButton.interactable = valid;
+        profileButton.interactable = valid;
         ProfileController.username = usernameField.text;
     }
 
     void EnterLobby()
     {
-        enterLobbyButton.SetEnabled(false);
-        usernameField.SetEnabled(false);
+        enterLobbyButton.interactable = false;
+        usernameField.interactable = false;
 
-        SceneManager.LoadScene(lobbyScene.name);
+        SceneManager.LoadScene(lobbyScene);
     }
 
     void EnterLocalMatch()
     {
         BaseGameManager.InitializeLocal();
 
-        SceneManager.LoadScene(setupScene.name);
+        SceneManager.LoadScene(setupScene);
     }
 
     void EnterProfile()
     {
-        SceneManager.LoadScene(profileScene.name);
+        SceneManager.LoadScene(profileScene);
     }
 }

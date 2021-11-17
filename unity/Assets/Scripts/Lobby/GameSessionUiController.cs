@@ -1,17 +1,17 @@
-﻿using UnityEngine.UIElements;
+﻿using UnityEngine.UI;
 using UnityEngine;
-using System;
+using UnityEngine.Events;
 
 public class GameSessionUiController: MonoBehaviour
 {
     public Button playButton;
-    public TextField passwordField;
-    public Label usernameField;
-    public Label publicPrivateText;
+    public InputField passwordField;
+    public Text usernameField;
+    public Text publicPrivateText;
 
-    public void SetPlayCallback(Action callback)
+    public void SetPlayCallback(UnityAction callback)
     {
-        playButton.clicked += (callback);
+        playButton.onClick.AddListener(callback);
     }
 
     public void SetUsername(string username)
@@ -22,7 +22,7 @@ public class GameSessionUiController: MonoBehaviour
     public void SetPrivacy(bool isPrivate)
     {
         publicPrivateText.text = isPrivate ? "Private" : "Public";
-        passwordField.style.visibility = isPrivate ? Visibility.Hidden : Visibility.Visible;
+        passwordField.gameObject.SetActive(isPrivate);
     }
 
     public string GetPassword()
@@ -32,6 +32,6 @@ public class GameSessionUiController: MonoBehaviour
 
     public void DeactivateButton()
     {
-        playButton.SetEnabled(false);
+        playButton.interactable = false;
     }
 }

@@ -1,30 +1,23 @@
-﻿using UnityEngine.UIElements;
+﻿using UnityEngine.UI;
 using System.Linq;
 
 public class NewGameSessionUiController : GameSessionUiController
 {
-    public DropdownMenu publicPrivateDropdown;
-    private bool _isPrivate; 
+    public Dropdown publicPrivateDropdown;
 
     public void Start()
     {
-        publicPrivateDropdown.AppendAction(
-            "public", (e) => DropdownCallback(false)
-        );
-        publicPrivateDropdown.AppendAction(
-            "privete", (e) => DropdownCallback(true)
-        );
+        publicPrivateDropdown.onValueChanged.AddListener((e) => DropdownCallback(e == 1));
     }
 
     public void DropdownCallback(bool isPrivate)
     {
-        passwordField.style.visibility = isPrivate ? Visibility.Visible : Visibility.Hidden;
-        playButton.SetEnabled(!isPrivate || !passwordField.text.Equals(""));
-        _isPrivate = isPrivate;
+        passwordField.gameObject.SetActive(isPrivate);
+        playButton.interactable = (!isPrivate || !passwordField.text.Equals(""));
     }
 
     public bool GetPrivacy()
     {
-        return _isPrivate;
+        return publicPrivateDropdown.value == 1;
     }
 }

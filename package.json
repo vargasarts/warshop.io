@@ -7,9 +7,14 @@
   "scripts": {
     "format": "prettier --write \"**/*.tsx\"",
     "lint": "eslint . --ext .ts,.tsx",
-    "api": "localhost-lambdas",
+    "api": "fuego api",
     "build": "fuego build",
-    "deploy": "fuego deploy"
+    "deploy": "fuego deploy",
+    "compile": "fuego compile",
+    "publish": "fuego publish",
+    "gamelift": "java -jar GameLiftLocal.jar",
+    "preserver": "node scripts/build-server.js",
+    "server": "node dist/index.js"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.83",
@@ -22,7 +27,6 @@
     "esbuild": "^0.12.24",
     "eslint": "^7.32.0",
     "fuegojs": "^0.16.2",
-    "localhost-lambdas": "^0.2.14",
     "prettier": "^2.3.2",
     "tslint-config-prettier": "^1.18.0",
     "tslint-react-hooks": "^2.2.2",
@@ -33,6 +37,7 @@
     "@dvargas92495/api": "^0.2.4",
     "@dvargas92495/ui": "^0.44.0",
     "aws-sdk": "^2.981.0",
+    "aws-sdk-plus": "^0.4.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "ws": "^8.2.3"

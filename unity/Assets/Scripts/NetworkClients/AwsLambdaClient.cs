@@ -4,7 +4,12 @@ using UnityEngine.Networking;
 
 public class AwsLambdaClient
 {
-    public const string GATEWAY_URL = "https://l1o387pdnb.execute-api.us-east-1.amazonaws.com/production";
+    #if UNITY_EDITOR
+      public const string GATEWAY_URL = "http://localhost:3003";
+    #else
+      public const string GATEWAY_URL = "https://api.warshop.io";
+    #endif
+
     public static void SendCreateGameRequest(bool isPriv, string username, string pass, UnityAction<string, string, int> callback)
     {
         Messages.CreateGameRequest request = new Messages.CreateGameRequest

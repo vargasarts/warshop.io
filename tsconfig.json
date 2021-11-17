@@ -23,9 +23,9 @@
     "allowSyntheticDefaultImports": true
   },
   "include": [
-    "src",
+    "server",
     "pages",
-    "lambdas"
+    "functions"
   ],
   "exclude": [
     "node_modules",
