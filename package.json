@@ -14,7 +14,8 @@
     "publish": "fuego publish",
     "gamelift": "java -jar GameLiftLocal.jar -p 9080",
     "preserver": "node scripts/build-server.js",
-    "server": "node dist/index.js"
+    "server": "node dist/index.js",
+    "start": "concurrently \"npm:gamelift\" \"npm:server\" \"npm:api\""
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.83",
@@ -24,6 +25,7 @@
     "@types/ws": "^8.2.0",
     "@typescript-eslint/eslint-plugin": "^4.30.0",
     "@typescript-eslint/parser": "^4.30.0",
+    "concurrently": "^6.4.0",
     "esbuild": "^0.12.24",
     "eslint": "^7.32.0",
     "fuegojs": "^0.16.2",

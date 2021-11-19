@@ -10,7 +10,7 @@ public class AwsLambdaClient
       public const string GATEWAY_URL = "https://api.warshop.io";
     #endif
 
-    public static void SendCreateGameRequest(bool isPriv, string username, string pass, UnityAction<string, string, int> callback)
+    public static void SendCreateGameRequest(bool isPriv, string username, string pass, UnityAction<string, string, int> callback, UnityAction<string> reject)
     {
         Messages.CreateGameRequest request = new Messages.CreateGameRequest
         {
@@ -19,14 +19,14 @@ public class AwsLambdaClient
             password = isPriv ? pass : "NONE"
         };
         UnityWebRequest www = UnityWebRequest.Put(GATEWAY_URL + "/games", JsonUtility.ToJson(request));
-        www.SendWebRequest().completed += (op) => CreateGameResponse(www, callback);
+        www.SendWebRequest().completed += (op) => CreateGameResponse(www, callback, reject);
     }
 
-    private static void CreateGameResponse(UnityWebRequest www, UnityAction<string, string, int> callback)
+    private static void CreateGameResponse(UnityWebRequest www, UnityAction<string, string, int> callback, UnityAction<string> reject)
     {
         if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
         {
-            Debug.LogError("Error creating new game: \n" + www.downloadHandler.text);
+            reject("Error creating new game: \n" + www.downloadHandler.text);
         }
         else
         {
@@ -63,17 +63,17 @@ public class AwsLambdaClient
         www.Dispose();
     }
 
-    public static void SendFindAvailableGamesRequest(UnityAction<Messages.GameView[]> callback)
+    public static void SendFindAvailableGamesRequest(UnityAction<Messages.GameView[]> callback, UnityAction<string> reject)
     {
         UnityWebRequest www = UnityWebRequest.Get(GATEWAY_URL + "/games");
-        www.SendWebRequest().completed += (op) => FindAvailableGamesResponse(www, callback);
+        www.SendWebRequest().completed += (op) => FindAvailableGamesResponse(www, callback, reject);
     }
 
-    private static void FindAvailableGamesResponse(UnityWebRequest www, UnityAction<Messages.GameView[]> callback)
+    private static void FindAvailableGamesResponse(UnityWebRequest www, UnityAction<Messages.GameView[]> callback, UnityAction<string> reject)
     {
         if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
         {
-            Debug.LogError("Error finding available games: \n" + www.downloadHandler.text);
+            reject("Error finding available games: \n" + www.downloadHandler.text);
         }
         else
         {

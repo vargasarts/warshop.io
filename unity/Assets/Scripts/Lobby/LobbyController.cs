@@ -16,7 +16,7 @@ public class LobbyController : MonoBehaviour
 
     void Start ()
     {
-        AwsLambdaClient.SendFindAvailableGamesRequest(FindAvailableGamesCallback);
+        AwsLambdaClient.SendFindAvailableGamesRequest(FindAvailableGamesCallback, Reject);
 
         newGameSessionUI.SetUsername(ProfileController.username);
         newGameSessionUI.SetPlayCallback(NewGame);
@@ -44,7 +44,7 @@ public class LobbyController : MonoBehaviour
         DeactivateButtons();
         bool isPrivate = newGameSessionUI.GetPrivacy();
         string password = newGameSessionUI.GetPassword();
-        AwsLambdaClient.SendCreateGameRequest(isPrivate, ProfileController.username, password, SetupGame);
+        AwsLambdaClient.SendCreateGameRequest(isPrivate, ProfileController.username, password, SetupGame, Reject);
     }
 
     void JoinGame(GameSessionUiController match, string gameSessionId)
@@ -69,5 +69,16 @@ public class LobbyController : MonoBehaviour
     void LoadInitial()
     {
         SceneManager.LoadScene(initialScene);
+    }
+
+    public void OnCanvasClick()
+    {
+        statusModal.Hide();
+        newGameSessionUI.ReactivateButton();
+        gameSessionUIs.ToList().ForEach(g => g.ReactivateButton());
+    }
+
+    public void Reject(string s) {
+        statusModal.DisplayError(s);
     }
 }

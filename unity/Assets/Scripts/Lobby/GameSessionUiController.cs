@@ -12,6 +12,7 @@ public class GameSessionUiController: MonoBehaviour
     public void SetPlayCallback(UnityAction callback)
     {
         playButton.onClick.AddListener(callback);
+        passwordField.onValueChanged.AddListener((v) => playButton.interactable = v.Length > 0);
     }
 
     public void SetUsername(string username)
@@ -28,6 +29,11 @@ public class GameSessionUiController: MonoBehaviour
     public string GetPassword()
     {
         return passwordField.text;
+    }
+
+    public void ReactivateButton()
+    {
+        playButton.interactable = publicPrivateText.text == "Public" || passwordField.text.Length > 0;
     }
 
     public void DeactivateButton()
