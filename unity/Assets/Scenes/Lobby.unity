@@ -1078,13 +1078,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6361a1222caf924daf9106da86c0d1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  backButton: {fileID: 1823166056}
   newGameSessionUI: {fileID: 2105518633}
   gameSessionUI: {fileID: 114124043811574296, guid: 206f192ab8c01234f8647df6487d816d, type: 3}
   gameSessionUIs: []
   initialScene:
-    m_Handle: 0
+    sceneAsset: {fileID: 102900000, guid: 00ed4ba23fb052d42ba04200a91cf92d, type: 3}
+    scenePath: Assets/Scenes/Initial.unity
   setupScene:
-    m_Handle: 0
+    sceneAsset: {fileID: 102900000, guid: 8c8e7c869c0e1434087165687f65a116, type: 3}
+    scenePath: Assets/Scenes/Setup.unity
   statusModal: {fileID: 656025966}
   matches: {fileID: 0}
 --- !u!114 &738706554
@@ -2241,7 +2244,7 @@ GameObject:
   - component: {fileID: 1804946363}
   - component: {fileID: 1804946362}
   m_Layer: 5
-  m_Name: Text
+  m_Name: PasswordText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2887,8 +2890,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92fc8f68877ea2442adb0b6c1f892ee1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playButton: {fileID: 0}
-  passwordField: {fileID: 0}
-  usernameField: {fileID: 0}
-  publicPrivateText: {fileID: 0}
-  publicPrivateDropdown: {fileID: 0}
+  playButton: {fileID: 1506498897}
+  passwordField: {fileID: 845672333}
+  usernameField: {fileID: 2003351545}
+  publicPrivateText: {fileID: 792002796}
+  publicPrivateDropdown: {fileID: 1692203813}

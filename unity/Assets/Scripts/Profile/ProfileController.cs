@@ -6,9 +6,9 @@ public class ProfileController : MonoBehaviour
 {
     public Button backToInitialButton;
     public Label usernameText;
-    public Scene initialScene;
+    public SceneReference initialScene;
 
-    internal static string username;
+    public static string username;
 
     void Start ()
     {
@@ -18,6 +18,6 @@ public class ProfileController : MonoBehaviour
 
     void BackToInitial()
     {
-        SceneManager.LoadScene(initialScene.name);
+        SceneManager.LoadScene(initialScene);
     }
 }

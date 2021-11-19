@@ -12,7 +12,7 @@
     "deploy": "fuego deploy",
     "compile": "fuego compile",
     "publish": "fuego publish",
-    "gamelift": "java -jar GameLiftLocal.jar",
+    "gamelift": "java -jar GameLiftLocal.jar -p 9080",
     "preserver": "node scripts/build-server.js",
     "server": "node dist/index.js"
   },

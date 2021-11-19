@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Linq;
 
@@ -9,8 +9,8 @@ public class LobbyController : MonoBehaviour
     public NewGameSessionUiController newGameSessionUI;
     public GameSessionUiController gameSessionUI;
     public GameSessionUiController[] gameSessionUIs;
-    public Scene initialScene;
-    public Scene setupScene;
+    public SceneReference initialScene;
+    public SceneReference setupScene;
     public StatusModalController statusModal;
     public GridLayout matches;
 
@@ -20,7 +20,7 @@ public class LobbyController : MonoBehaviour
 
         newGameSessionUI.SetUsername(ProfileController.username);
         newGameSessionUI.SetPlayCallback(NewGame);
-        backButton.clicked +=LoadInitial;
+        backButton.onClick.AddListener(LoadInitial);
     }
 
     void FindAvailableGamesCallback(Messages.GameView[] gameViews)
@@ -57,7 +57,7 @@ public class LobbyController : MonoBehaviour
     void SetupGame(string playerSessionId, string ipAddress, int port)
     {
         BaseGameManager.InitializeStandard(playerSessionId, ipAddress, port);
-        SceneManager.LoadScene(setupScene.name);
+        SceneManager.LoadScene(setupScene);
     }
 
     void DeactivateButtons()
@@ -68,6 +68,6 @@ public class LobbyController : MonoBehaviour
 
     void LoadInitial()
     {
-        SceneManager.LoadScene(initialScene.name);
+        SceneManager.LoadScene(initialScene);
     }
 }

@@ -1,18 +1,20 @@
 import createAPIGatewayProxyHandler from "aws-sdk-plus/dist/createAPIGatewayProxyHandler";
-import AWS from "aws-sdk";
-
-const gamelift = new AWS.GameLift();
+import { gamelift } from "../_common";
 
 const logic = () => {
-  return gamelift
-    .listAliases({ Name: "WarshopServer" })
-    .promise()
-    .then((res) => {
-      const AliasId = res.Aliases?.[0]?.AliasId || "";
-      return gamelift.describeAlias({ AliasId }).promise();
-    })
-    .then((res) => {
-      const FleetId = res.Alias?.RoutingStrategy?.FleetId;
+  return (
+    process.env.NODE_ENV === "development"
+      ? Promise.resolve("fleet-123")
+      : gamelift
+          .listAliases({ Name: "WarshopServer" })
+          .promise()
+          .then((res) => {
+            const AliasId = res.Aliases?.[0]?.AliasId || "";
+            return gamelift.describeAlias({ AliasId }).promise();
+          })
+          .then((res) => res.Alias?.RoutingStrategy?.FleetId)
+  )
+    .then((FleetId) => {
       return gamelift
         .describeGameSessions({ FleetId, StatusFilter: "ACTIVE" })
         .promise();
