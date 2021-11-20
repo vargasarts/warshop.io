@@ -18,7 +18,7 @@ public class AwsLambdaClient
             isPrivate = isPriv,
             password = isPriv ? pass : "NONE"
         };
-        UnityWebRequest www = UnityWebRequest.Put(GATEWAY_URL + "/games", JsonUtility.ToJson(request));
+        UnityWebRequest www = UnityWebRequest.Post(GATEWAY_URL + "/game", JsonUtility.ToJson(request));
         www.SendWebRequest().completed += (op) => CreateGameResponse(www, callback, reject);
     }
 
