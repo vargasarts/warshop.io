@@ -48,14 +48,4 @@ const logic = ({
 };
 
 export const handler = createAPIGatewayProxyHandler(logic);
-
-/**
-int retries = 0;
-while (gameSession.Status.Equals(GameSessionStatus.ACTIVATING) && retries < 100)
-{
-    DescribeGameSessionsRequest describeReq = new DescribeGameSessionsRequest();
-    describeReq.GameSessionId = res.GameSession.GameSessionId;
-    gameSession = (await amazonClient.DescribeGameSessionsAsync(describeReq)).GameSessions[0];
-    retries++;
-}
- */
+export type Handler = typeof logic;
