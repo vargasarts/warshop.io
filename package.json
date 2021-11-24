@@ -10,12 +10,13 @@
     "api": "fuego api",
     "build": "fuego build",
     "deploy": "fuego deploy",
+    "fe": "fuego fe",
     "compile": "fuego compile",
     "publish": "fuego publish",
     "gamelift": "java -jar GameLiftLocal.jar -p 9080",
     "preserver": "node scripts/build-server.js",
     "server": "node dist/index.js",
-    "start": "concurrently \"npm:gamelift\" \"npm:server\" \"npm:api\""
+    "start": "concurrently \"npm:gamelift\" \"npm:server 12345\" \"npm:server 12346\" \"npm:server 12347\" \"npm:api\" \"npm:fe\""
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.83",
@@ -32,14 +33,14 @@
     "prettier": "^2.3.2",
     "tslint-config-prettier": "^1.18.0",
     "tslint-react-hooks": "^2.2.2",
-    "typescript": "^4.4.2"
+    "typescript": "^4.5.2"
   },
   "dependencies": {
     "@dplusic/gamelift-nodejs-serversdk": "0.0.1",
     "@dvargas92495/api": "^0.2.4",
-    "@dvargas92495/ui": "^0.44.0",
+    "@dvargas92495/ui": "^0.44.4",
     "aws-sdk": "^2.981.0",
-    "aws-sdk-plus": "^0.4.1",
+    "aws-sdk-plus": "^0.4.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "ws": "^8.2.3"

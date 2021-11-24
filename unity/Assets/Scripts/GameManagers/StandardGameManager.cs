@@ -10,7 +10,7 @@ public class StandardGameManager : BaseGameManager
     protected override void InitializeSetupImpl(SetupController sc)
     {
         base.InitializeSetupImpl(sc);
-        sc.backButton.clicked += sc.EnterLobby;
+        sc.backButton.onClick.AddListener(sc.EnterLobby);
         gameClient.AsAws().ConnectToGameServer(setupController.statusModal.DisplayError);
     }
 

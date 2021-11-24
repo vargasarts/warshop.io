@@ -3,6 +3,7 @@ build
 dist
 out
 .env
+_fuego
 
 unity/Library
 unity/Temp

@@ -17,7 +17,7 @@ public class LocalGameManager : BaseGameManager
         base.InitializeSetupImpl(sc);
         sc.opponentSquadPanel.gameObject.SetActive(true);
         sc.opponentSquadPanel.SetAddCallback(sc.AddSelectedToOpponentSquad);
-        sc.backButton.clicked +=sc.EnterInitial;
+        sc.backButton.onClick.AddListener(sc.EnterInitial);
         gameClient.AsLocal().ConnectToGameServer();
     }
 

@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using System.Linq;
@@ -10,39 +10,39 @@ public class SetupController : MonoBehaviour
     public Button startGameButton;
     public MaximizedRosterRobotController maximizedRosterRobot;
     public RobotRosterPanelController robotRosterPanel;
-    public Scene lobbyScene;
-    public Scene initialScene;
+    public SceneReference lobbyScene;
+    public SceneReference initialScene;
     public Sprite[] robotDir;
     public SquadPanelController mySquadPanel;
     public SquadPanelController opponentSquadPanel;
     public StatusModalController statusModal;
-    public Label starText;
+    public Text starText;
     
     void Start ()
     {
         BaseGameManager.InitializeSetup(this);
         
         mySquadPanel.SetAddCallback(AddSelectedToMySquad);
-        startGameButton.clicked +=StartGame;
+        startGameButton.onClick.AddListener(StartGame);
         robotRosterPanel.SetMaximizeCallback(maximizeSelection);
         robotDir.ToList().ForEach(robotRosterPanel.AddRobotImage);
     }
 
     public void EnterLobby()
     {
-        SceneManager.LoadScene(lobbyScene.name);
+        SceneManager.LoadScene(lobbyScene);
     }
 
     public void EnterInitial()
     {
-        SceneManager.LoadScene(initialScene.name);
+        SceneManager.LoadScene(initialScene);
     }
 
     public void maximizeSelection(Sprite selectedRobot)
     {
         maximizedRosterRobot.Select(selectedRobot);
-        mySquadPanel.squadPanelButton.SetEnabled(true);
-        opponentSquadPanel.squadPanelButton.SetEnabled(true);
+        mySquadPanel.squadPanelButton.interactable= true;
+        opponentSquadPanel.squadPanelButton.interactable=true;
     }
 
     public void AddSelectedToMySquad(SquadPanelController squadPanel)
@@ -64,8 +64,8 @@ public class SetupController : MonoBehaviour
         addedRobot.SetRating(maximizedRosterRobot.GetRating());
 
         maximizedRosterRobot.Hide();
-        mySquadPanel.squadPanelButton.SetEnabled(false);
-        opponentSquadPanel.squadPanelButton.SetEnabled(false);
+        mySquadPanel.squadPanelButton.interactable =(false);
+        opponentSquadPanel.squadPanelButton.interactable =(false);
     }
 
     public void RemoveAddedFromMySquad(RobotSquadImageController robot)
@@ -95,6 +95,6 @@ public class SetupController : MonoBehaviour
     void UpdateStarText()
     {
         starText.text = mySquadPanel.GetNumRobots().ToString() + "/" + GameConstants.MAX_ROBOTS_ON_SQUAD.ToString();
-        startGameButton.SetEnabled(mySquadPanel.GetNumRobots() <= GameConstants.MAX_ROBOTS_ON_SQUAD);
+        startGameButton.interactable = (mySquadPanel.GetNumRobots() <= GameConstants.MAX_ROBOTS_ON_SQUAD);
     }
 }

@@ -1,11 +1,11 @@
-﻿using UnityEngine.UIElements;
+﻿using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine;
 
 public class ProfileController : MonoBehaviour
 {
     public Button backToInitialButton;
-    public Label usernameText;
+    public Text usernameText;
     public SceneReference initialScene;
 
     public static string username;
@@ -13,7 +13,7 @@ public class ProfileController : MonoBehaviour
     void Start ()
     {
         usernameText.text = username;
-        backToInitialButton.clicked += (BackToInitial);
+        backToInitialButton.onClick.AddListener(BackToInitial);
 	}
 
     void BackToInitial()

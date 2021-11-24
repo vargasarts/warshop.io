@@ -12,7 +12,7 @@ public class LobbyController : MonoBehaviour
     public SceneReference initialScene;
     public SceneReference setupScene;
     public StatusModalController statusModal;
-    public GridLayout matches;
+    public VerticalLayoutGroup matches;
 
     void Start ()
     {
@@ -25,8 +25,6 @@ public class LobbyController : MonoBehaviour
 
     void FindAvailableGamesCallback(Messages.GameView[] gameViews)
     {
-        Debug.Log(gameViews);
-        Debug.Log(gameViews.Length);
         gameSessionUIs = gameViews.ToList().ConvertAll(g => CreateGameSessionUi(g.gameSessionId, g.creatorId, g.isPrivate)).ToArray();
     }
 

@@ -25,3 +25,4 @@ const logic = () => {
 };
 
 export const handler = createAPIGatewayProxyHandler(logic);
+export type Handler = typeof logic;

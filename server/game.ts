@@ -1,28 +1,32 @@
 import { Map } from "./map";
 import { WebSocket } from "ws";
 
+type Position = {
+  x: number;
+  y: number;
+}
+
+type Robot = {
+  id: number,
+  position: Position;
+}
+
 type Player = {
   joined: boolean;
   ws: WebSocket;
   name: string;
   ready: boolean;
+  team: Robot[];
 };
 
 export type Game = {
-  gameSessionId?: string;
-  board?: Map;
+  healthChecks: number;
+  gameSessionId: string;
+  board: Map;
+  nextRobotId: 0;
   primary?: Player;
   secondary?: Player;
   turn?: number;
-};
-
-export const joinGame = (props: {
-  game: Game;
-  name: string;
-  robots: unknown[];
-  ws: WebSocket;
-}): Game => {
-  return props.game;
 };
 
 export const storeCommands = (p: Player, commands: unknown[]): void => {

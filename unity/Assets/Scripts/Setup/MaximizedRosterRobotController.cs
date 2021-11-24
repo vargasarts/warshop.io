@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
 using System.Linq;
 
 public class MaximizedRosterRobotController : MonoBehaviour
@@ -18,7 +18,7 @@ public class MaximizedRosterRobotController : MonoBehaviour
     {
         container.gameObject.SetActive(true);
 
-        selectedRobot.image = robotSprite.texture;
+        selectedRobot.sprite = robotSprite;
         nameField.text  = robotSprite.name;
         Robot robot = Robot.create(robotSprite.name);
         attackField.text= robot.attack.ToString();
@@ -27,9 +27,9 @@ public class MaximizedRosterRobotController : MonoBehaviour
         Enumerable.Range(0, ratingGroup.transform.childCount).ToList().ForEach(SetRating);
     }
 
-    public Texture GetRobotSprite()
+    public Sprite GetRobotSprite()
     {
-        return selectedRobot.image;
+        return selectedRobot.sprite;
     }
 
     public void Hide()

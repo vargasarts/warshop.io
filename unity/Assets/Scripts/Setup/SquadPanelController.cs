@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
 using UnityEngine.Events;
 using System.Collections.Generic;
 
@@ -13,7 +13,7 @@ public class SquadPanelController : MonoBehaviour
 
     public void SetAddCallback(UnityAction<SquadPanelController> callback)
     {
-        squadPanelButton.clicked += (() => callback(this));
+        squadPanelButton.onClick.AddListener(() => callback(this));
     }
 
     public RobotSquadImageController AddRobotSquadImage()

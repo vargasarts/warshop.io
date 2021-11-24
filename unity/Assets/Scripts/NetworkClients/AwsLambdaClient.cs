@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
+using System.Collections.Generic;
 
 public class AwsLambdaClient
 {
@@ -12,13 +13,11 @@ public class AwsLambdaClient
 
     public static void SendCreateGameRequest(bool isPriv, string username, string pass, UnityAction<string, string, int> callback, UnityAction<string> reject)
     {
-        Messages.CreateGameRequest request = new Messages.CreateGameRequest
-        {
-            playerId = username,
-            isPrivate = isPriv,
-            password = isPriv ? pass : "NONE"
-        };
-        UnityWebRequest www = UnityWebRequest.Post(GATEWAY_URL + "/game", JsonUtility.ToJson(request));
+        UnityWebRequest www = UnityWebRequest.Post(GATEWAY_URL + "/game", new Dictionary<string,string>(){
+            {"playerId", username},
+            {"isPrivate", isPriv.ToString()},
+            {"password", pass}
+        });
         www.SendWebRequest().completed += (op) => CreateGameResponse(www, callback, reject);
     }
 
@@ -38,14 +37,11 @@ public class AwsLambdaClient
 
     public static void SendJoinGameRequest(string gId, string username, string pass, UnityAction<string, string, int> callback)
     {
-        Messages.JoinGameRequest request = new Messages.JoinGameRequest
-        {
-            playerId = username,
-            gameSessionId = gId,
-            password = pass
-        };
-        UnityWebRequest www = UnityWebRequest.Put(GATEWAY_URL + "/games", JsonUtility.ToJson(request));
-        www.method = "POST"; //LOL you freaking suck Unity
+        UnityWebRequest www = UnityWebRequest.Post(GATEWAY_URL + "/join", new Dictionary<string,string>(){
+            {"playerId", username},
+            {"gameSessionId",gId},
+            {"password", pass}
+        });
         www.SendWebRequest().completed += (op) => JoinGameResponse(www, callback);
     }
 

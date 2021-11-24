@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
 
 public class RobotSquadImageController : MonoBehaviour
 {
@@ -11,12 +11,12 @@ public class RobotSquadImageController : MonoBehaviour
 
     public void SetRemoveCallback(UnityAction<RobotSquadImageController> callback)
     {
-        removeButton.clicked += (() => callback(this));
+        removeButton.onClick.AddListener(() => callback(this));
     }
 
-    public void SetSprite(Texture robotSprite)
+    public void SetSprite(Sprite robotSprite)
     {
-        robotImage.image = robotSprite;
+        robotImage.sprite = robotSprite;
     }
 
     public void SetRating(byte r)
@@ -31,6 +31,6 @@ public class RobotSquadImageController : MonoBehaviour
 
     public string GetName()
     {
-        return robotImage.image.name;
+        return robotImage.sprite.name;
     }
 }

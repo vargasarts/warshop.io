@@ -337,21 +337,6 @@ public class Messages {
         public string exceptionMessage {get; set;}
     }
     public class EndGameMessage { }
-
-    //Gateway Objects, TODO: Get rid of repeated classes
-    public class CreateGameRequest
-    {
-        public string playerId {get; set;}
-        public bool isPrivate {get; set;}
-        public string password {get; set;}
-    }
-
-    public class JoinGameRequest
-    {
-        public string playerId {get; set;}
-        public string gameSessionId {get; set;}
-        public string password {get; set;}
-    }
     [Serializable]
     public class GameView {
         public string gameSessionId;
@@ -364,17 +349,22 @@ public class Messages {
         public GameView[] gameViews;
     }
 
+    [Serializable]
     public class GameSessionResponse
     {
-        public string playerSessionId {get; set;}
-        public string ipAddress {get; set;}
-        public int port {get; set;}
+        public string playerSessionId;
+        public string ipAddress;
+        public int port;
     }
+    [Serializable]
     public class CreateGameResponse : GameSessionResponse { }
+    [Serializable]
     public class JoinGameResponse : GameSessionResponse { }
 
+    [Serializable]
     public class SocketMessageProps {}
 
+    [Serializable]
     public class SocketMessage {
         public string name;
         public SocketMessageProps props;

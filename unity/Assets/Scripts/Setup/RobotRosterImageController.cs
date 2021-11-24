@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
 using UnityEngine.Events;
 
 public class RobotRosterImageController : MonoBehaviour
@@ -10,7 +10,7 @@ public class RobotRosterImageController : MonoBehaviour
     public void Initialize(Sprite sprite, UnityAction<Sprite> maximizeCallback)
     {
         name = sprite.name;
-        myImage.image = sprite.texture;
-        maximizeButton.clicked += (() => maximizeCallback(sprite));
+        myImage.sprite = sprite;
+        maximizeButton.onClick.AddListener(() => maximizeCallback(sprite));
     }
 }

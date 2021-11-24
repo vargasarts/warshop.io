@@ -1,11 +1,11 @@
-﻿using UnityEngine.UIElements;
+﻿using UnityEngine.UI;
 using UnityEngine;
 
 public class StatsController : MonoBehaviour
 {
-    public Label myScore;
-    public Label opponentScore;
-    public Label timeText;
+    public Text myScore;
+    public Text opponentScore;
+    public Text timeText;
 
     public void Initialize(EndEvent evt)
     {
