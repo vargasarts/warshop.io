@@ -23,7 +23,6 @@ public class AwsGameClient : GameClient
         try
         {
             ws = new WebSocket("ws://" + ip + ":" + port);
-            ws.Connect();
             ws.OnMessage += (sender, e) =>
             {
                 Messages.SocketMessage message = JsonUtility.FromJson<Messages.SocketMessage>(e.Data);
@@ -33,7 +32,9 @@ public class AwsGameClient : GameClient
                         return;
                 }
             };
+            ws.OnOpen += OnConnect;
             Debug.Log("Attempting to connect to " + ip + ":" + port);
+            ws.Connect();
         }
         catch(Exception e)
         {
@@ -42,7 +43,7 @@ public class AwsGameClient : GameClient
         }
     }
 
-    private void OnConnect()
+    private void OnConnect(object sender, EventArgs e)
     {
         Debug.Log("Connected");
 

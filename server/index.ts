@@ -150,7 +150,8 @@ const onSubmitCommands = (
     } else {
       ws.send(JSON.stringify({ name: "WAITING_COMMANDS", props: {} }));
     }
-  } catch (e) {
+  } catch (err) {
+    const e = err as Error;
     console.error(e);
     const props = {
       serverMessage:
@@ -197,6 +198,7 @@ if (outcome.Success) {
           game
         );
       });
+      console.log('client connected!', ws.url);
     });
     wss.on("listening", () => {
       console.log(`listening on ${port}`);
