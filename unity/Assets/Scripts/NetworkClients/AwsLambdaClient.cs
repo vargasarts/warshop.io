@@ -35,21 +35,21 @@ public class AwsLambdaClient
         www.Dispose();
     }
 
-    public static void SendJoinGameRequest(string gId, string username, string pass, UnityAction<string, string, int> callback)
+    public static void SendJoinGameRequest(string gId, string username, string pass, UnityAction<string, string, int> callback, UnityAction<string> reject)
     {
         UnityWebRequest www = UnityWebRequest.Post(GATEWAY_URL + "/join", new Dictionary<string,string>(){
             {"playerId", username},
             {"gameSessionId",gId},
             {"password", pass}
         });
-        www.SendWebRequest().completed += (op) => JoinGameResponse(www, callback);
+        www.SendWebRequest().completed += (op) => JoinGameResponse(www, callback, reject);
     }
 
-    private static void JoinGameResponse(UnityWebRequest www, UnityAction<string, string, int> callback)
+    private static void JoinGameResponse(UnityWebRequest www, UnityAction<string, string, int> callback, UnityAction<string> reject)
     {
         if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
         {
-            Debug.LogError("Error joining game: \n" + www.downloadHandler.text);
+            reject("Error joining game: \n" + www.downloadHandler.text);
         }
         else
         {
@@ -73,7 +73,6 @@ public class AwsLambdaClient
         }
         else
         {
-            Debug.Log(www.downloadHandler.text);
             Messages.GetGamesResponse res = JsonUtility.FromJson<Messages.GetGamesResponse>(www.downloadHandler.text);
             callback(res.gameViews);
         }

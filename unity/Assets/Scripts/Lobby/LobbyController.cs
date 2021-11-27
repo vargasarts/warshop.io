@@ -49,7 +49,7 @@ public class LobbyController : MonoBehaviour
     {
         DeactivateButtons();
         string password = match.GetPassword();
-        AwsLambdaClient.SendJoinGameRequest(gameSessionId, ProfileController.username, password, SetupGame);
+        AwsLambdaClient.SendJoinGameRequest(gameSessionId, ProfileController.username, password, SetupGame, Reject);
     }
 
     void SetupGame(string playerSessionId, string ipAddress, int port)

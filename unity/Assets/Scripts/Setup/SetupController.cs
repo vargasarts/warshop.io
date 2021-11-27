@@ -61,7 +61,6 @@ public class SetupController : MonoBehaviour
         RobotSquadImageController addedRobot = squadPanel.AddRobotSquadImage();
         addedRobot.SetRemoveCallback(removeCallback);
         addedRobot.SetSprite(maximizedRosterRobot.GetRobotSprite());
-        addedRobot.SetRating(maximizedRosterRobot.GetRating());
 
         maximizedRosterRobot.Hide();
         mySquadPanel.squadPanelButton.interactable =(false);
