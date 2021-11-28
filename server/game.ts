@@ -6,7 +6,7 @@ type Position = {
   y: number;
 }
 
-type Robot = {
+export type Robot = {
   id: number,
   position: Position;
 }

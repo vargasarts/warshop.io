@@ -54,7 +54,7 @@ public class LobbyController : MonoBehaviour
 
     void SetupGame(string playerSessionId, string ipAddress, int port)
     {
-        BaseGameManager.InitializeStandard(playerSessionId, ipAddress, port);
+        BaseGameManager.Initialize(playerSessionId, ipAddress, port);
         SceneManager.LoadScene(setupScene);
     }
 

@@ -106,13 +106,21 @@ const onStartGame = (
     game.primary.ws.send(
       JSON.stringify({
         name: "GAME_READY",
-        props: { isPrimary: true },
+        isPrimary: true,
+        opponentName: game.secondary.name,
+        myTeam: game.primary.team,
+        opponentTeam: game.secondary.team,
+        board: game.board,
       })
     );
     game.secondary.ws.send(
       JSON.stringify({
         name: "GAME_READY",
-        props: { isPrimary: false },
+        isPrimary: true,
+        opponentName: game.primary.name,
+        myTeam: game.secondary.team,
+        opponentTeam: game.primary.team,
+        board: game.board,
       })
     );
   }
@@ -185,34 +193,39 @@ const MESSAGE_HANDLERS = {
 
 if (outcome.Success) {
   const paths = new LogParameters(["./logs"]);
-    const wss = new WebSocketServer({ port }, () => {
-      console.log("server started");
-    });
-    wss.on("connection", (ws) => {
-      ws.on("message", (data) => {
-        console.log("data received \n %o", data);
-        const { name, props } = JSON.parse(data.toString());
+  const wss = new WebSocketServer({ port }, () => {
+    console.log("server started");
+  });
+  wss.on("connection", (ws) => {
+    ws.on("message", (data) => {
+      try {
+        const { name, ...props } = JSON.parse(data.toString());
         MESSAGE_HANDLERS[name as keyof typeof MESSAGE_HANDLERS](
           props,
           ws,
           game
         );
-      });
-      console.log('client connected!', ws.url);
+      } catch (e) {
+        console.error("Latest message failed:");
+        console.error("- data:", data.toString());
+        console.error("- error:", e);
+      }
     });
-    wss.on("listening", () => {
-      console.log(`listening on ${port}`);
-      GameLiftServerAPI.ProcessReady(
-        new ProcessParameters(
-          onGameSession,
-          onUpdateGameSession,
-          onProcessTerminate,
-          onHealthCheck,
-          port,
-          paths
-        )
-      );
-    });
+    console.log("client connected!", ws.url);
+  });
+  wss.on("listening", () => {
+    console.log(`listening on ${port}`);
+    GameLiftServerAPI.ProcessReady(
+      new ProcessParameters(
+        onGameSession,
+        onUpdateGameSession,
+        onProcessTerminate,
+        onHealthCheck,
+        port,
+        paths
+      )
+    );
+  });
 } else {
   console.log(outcome);
 }

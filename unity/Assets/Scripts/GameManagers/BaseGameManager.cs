@@ -5,10 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public abstract class BaseGameManager
+public class BaseGameManager
 {
-    private static BaseGameManager instance;
-
     protected BoardController boardController;
     protected SetupController setupController;
     protected Game.Player myPlayer;
@@ -21,58 +19,44 @@ public abstract class BaseGameManager
     protected int currentHistoryIndex;
     protected List<HistoryState> history = new List<HistoryState>();
     protected Map board;
+    private static BaseGameManager instance;
 
-    public static void InitializeLocal()
+    public static void Initialize(string playerSessionId, string ipAddress, int port)
     {
-        instance = new LocalGameManager();
+        instance = new BaseGameManager(playerSessionId, ipAddress, port);
     }
 
-    public static void InitializeStandard(string playerSessionId, string ipAddress, int port)
+    public BaseGameManager(string playerSessionId, string ipAddress, int port) 
     {
-        instance = new StandardGameManager(playerSessionId, ipAddress, port);
+        gameClient = new GameClient(playerSessionId, ipAddress, port);
     }
 
     public static void InitializeSetup(SetupController sc)
     {
-        if (instance == null) InitializeLocal();
-        instance.InitializeSetupImpl(sc);
+        instance.setupController = sc;
+        sc.backButton.onClick.AddListener(sc.EnterLobby);
+        instance.gameClient.ConnectToGameServer(sc.statusModal.DisplayError);
     }
 
-    protected virtual void InitializeSetupImpl(SetupController sc)
+    public static void SendPlayerInfo(List<string> myRobotNames, string username, Action callback)
     {
-        setupController = sc;
-    }
-
-    public static void SendPlayerInfo(string[] myRobotNames, string username)
-    {
-        instance.SendPlayerInfoImpl(myRobotNames, username);
-    }
-
-    protected virtual void SendPlayerInfoImpl(string[] myRobotNames, string username)
-    {
-        myPlayer = new Game.Player(new Robot[0], username);
+        instance.myPlayer = new Game.Player(new List<Robot>(), username);
+        instance.gameClient.SendGameRequest(myRobotNames, instance.myPlayer.name, instance.LoadBoard, callback);
     }
 
     internal void LoadBoard(List<Robot> myTeam, List<Robot> opponentTeam, string opponentName, Map b)
     {
         myPlayer.team = myTeam;
-        opponentPlayer.team = opponentTeam;
-        opponentPlayer.name = opponentName;
+        opponentPlayer = new Game.Player(opponentTeam, opponentName);
         board = b;
-        SceneManager.LoadScene("Match");
     }
 
     public static void InitializeBoard(BoardController bc)
     {
-        instance.InitializeBoardImpl(bc);
-    }
-
-    protected void InitializeBoardImpl(BoardController bc)
-    {
-        boardController = bc;
-        boardController.InitializeBoard(board);
-        boardController.SetBattery(myPlayer.battery, opponentPlayer.battery);
-        InitializeRobots();
+        instance.boardController = bc;
+        instance.boardController.InitializeBoard(instance.board);
+        instance.boardController.SetBattery(instance.myPlayer.battery, instance.opponentPlayer.battery);
+        instance.InitializeRobots();
     }
 
     private void InitializeRobots()
@@ -98,31 +82,32 @@ public abstract class BaseGameManager
 
     public static void InitializeUI(UIController ui)
     {
-        instance.InitializeUiImpl(ui);
+        instance.uiController = ui;
+        instance.uiController.InitializeUI(instance.myPlayer, instance.opponentPlayer);
+        instance.robotControllers.Keys.ToList().ForEach(k => instance.uiController.BindUiToRobotController(k, instance.robotControllers[k]));
+        instance.uiController.submitCommands.SetCallback(instance.SubmitCommands);
+        instance.uiController.backToPresent.SetCallback(instance.BackToPresent);
+        instance.uiController.stepForwardButton.SetCallback(instance.StepForward);
+        instance.uiController.stepBackButton.SetCallback(instance.StepBackward);
+        instance.history.Add(instance.SerializeState(1, GameConstants.MAX_PRIORITY));
     }
 
-    protected void InitializeUiImpl(UIController ui)
+    protected void SubmitCommands()
     {
-        uiController = ui;
-        uiController.InitializeUI(myPlayer, opponentPlayer);
-        robotControllers.Keys.ToList().ForEach(k => uiController.BindUiToRobotController(k, robotControllers[k]));
-        uiController.submitCommands.SetCallback(SubmitCommands);
-        uiController.backToPresent.SetCallback(BackToPresent);
-        uiController.stepForwardButton.SetCallback(StepForward);
-        uiController.stepBackButton.SetCallback(StepBackward);
-        history.Add(SerializeState(1, GameConstants.MAX_PRIORITY));
+        List<Command> commands = GetSubmittedCommands(robotControllers.Values.ToList());
+        uiController.actionButtonContainer.SetButtons(false);
+        uiController.robotButtonContainer.SetButtons(false);
+        gameClient.SendSubmitCommands(commands, myPlayer.name, PlayEvents);
     }
 
-    protected abstract void SubmitCommands();
-
-    protected Command[] GetSubmittedCommands(List<RobotController> robotsToSubmit)
+    protected List<Command> GetSubmittedCommands(List<RobotController> robotsToSubmit)
     {
         uiController.LightUpPanel(true, true);
         List<Command> commands = robotsToSubmit.ConvertAll(AddCommands).SelectMany(x => x).ToList();
         uiController.commandButtonContainer.SetButtons(false);
         uiController.directionButtonContainer.SetButtons(false);
         uiController.submitCommands.Deactivate();
-        return commands.ToArray();
+        return commands;
     }
 
     private List<Command> AddCommands(RobotController robot)

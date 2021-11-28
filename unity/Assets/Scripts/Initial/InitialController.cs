@@ -5,7 +5,6 @@ using UnityEngine;
 public class InitialController : MonoBehaviour
 {
     public Button enterLobbyButton;
-    public Button enterLocalMatchButton;
     public Button profileButton;
     public InputField usernameField;
     public SceneReference lobbyScene;
@@ -15,7 +14,6 @@ public class InitialController : MonoBehaviour
     void Start ()
     {
         enterLobbyButton.onClick.AddListener(EnterLobby);
-        enterLocalMatchButton.onClick.AddListener(EnterLocalMatch);
         profileButton.onClick.AddListener(EnterProfile);
 
         usernameField.text = ProfileController.username;
@@ -28,7 +26,6 @@ public class InitialController : MonoBehaviour
     {
         bool valid = !string.IsNullOrEmpty(newValue);
         enterLobbyButton.interactable = valid;
-        enterLocalMatchButton.interactable = valid;
         profileButton.interactable = valid;
         ProfileController.username = usernameField.text;
     }
@@ -39,13 +36,6 @@ public class InitialController : MonoBehaviour
         usernameField.interactable = false;
 
         SceneManager.LoadScene(lobbyScene);
-    }
-
-    void EnterLocalMatch()
-    {
-        BaseGameManager.InitializeLocal();
-
-        SceneManager.LoadScene(setupScene);
     }
 
     void EnterProfile()

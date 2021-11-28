@@ -8,9 +8,9 @@ public class Game
         public List<Robot> team;
         public string name {get;internal set;}
         public short battery = GameConstants.POINTS_TO_WIN;
-        public Player(Robot[] t, string n)
+        public Player(List<Robot> t, string n)
         {
-            team = new List<Robot>(t);
+            team = t;
             name = n;
         }
     }
@@ -37,9 +37,9 @@ public class Map
     public int height { get; set; }
     public Space[] spaces{ get; set; }
     public abstract class Space {
-        public int x {get; set;}
-        public int y {get; set;}
-        public byte type {get; set;}
+        public int x;
+        public int y;
+        public byte type;
         
         protected const byte VOID_ID = 0;
         protected const byte BLANK_ID = 1;
@@ -99,15 +99,16 @@ public class Map
     }
 }
 
+[Serializable]
 public class Robot
 {
-    public string name {get; set;}
-    public string description {get; set;}
-    public byte priority {get; set;}
+    public string name;
+    public string description;
+    public byte priority;
     public short startingHealth;
-    public short health {get; set;}
-    public short attack {get; set;}
-    public short id {get; set;}
+    public short health;
+    public short attack;
+    public short id;
     internal Robot(string _name)
     {
         name = _name;
@@ -202,8 +203,8 @@ public class Command
 
 public class GameEvent {
     public byte priority {get; set; }
-    public short primaryBatteryCost {get; set;}
-    public short secondaryBatteryCost {get; set;}
+    public short primaryBatteryCost;
+    public short secondaryBatteryCost;
     public byte type { get; set; }
 }
 
@@ -213,13 +214,13 @@ public class ResolveEvent : GameEvent {
     public ResolveEvent() {
         type = EVENT_ID;
     }
-    public List<Tuple<short, Tuple<int, int>>> robotIdToSpawn {get; set;}
-    public List<Tuple<short, Tuple<int, int>>> robotIdToMove {get; set;}
-    public List<Tuple<short, short>> robotIdToHealth {get; set;}
-    public bool myBatteryHit {get; set;}
-    public bool opponentBatteryHit {get; set;}
+    public List<Tuple<short, Tuple<int, int>>> robotIdToSpawn;
+    public List<Tuple<short, Tuple<int, int>>> robotIdToMove;
+    public List<Tuple<short, short>> robotIdToHealth;
+    public bool myBatteryHit;
+    public bool opponentBatteryHit;
     public List<Tuple<int, int>> missedAttacks {get;set;}
-    public List<short> robotIdsBlocked {get; set;}
+    public List<short> robotIdsBlocked;
     public int GetNumResolutions()
     {
         return robotIdToSpawn.Count
@@ -238,9 +239,9 @@ public class EndEvent : GameEvent {
     public EndEvent() {
         type = EVENT_ID;
     }
-    public bool primaryLost {get; set;}
-    public bool secondaryLost {get; set;}
-    public short turnCount {get; set;}
+    public bool primaryLost;
+    public bool secondaryLost;
+    public short turnCount;
 }
 
 public class SpawnEvent : GameEvent
@@ -250,7 +251,7 @@ public class SpawnEvent : GameEvent
         type = EVENT_ID;
     }
 
-    public short robotId {get; set;}
+    public short robotId;
 }
 
 public class MoveEvent : GameEvent
@@ -259,9 +260,9 @@ public class MoveEvent : GameEvent
     public MoveEvent() {
         type = EVENT_ID;
     }
-    public Tuple<int, int> sourcePos {get; set;}
-    public Tuple<int, int> destinationPos {get; set;}
-    public short robotId {get; set;}
+    public Tuple<int, int> sourcePos;
+    public Tuple<int, int> destinationPos;
+    public short robotId;
 }
 
 public class AttackEvent : GameEvent
@@ -271,8 +272,8 @@ public class AttackEvent : GameEvent
     public AttackEvent() {
         type = EVENT_ID;
     }
-    public List<Tuple<int, int>> locs {get; set;}
-    public short robotId {get; set;}
+    public List<Tuple<int, int>> locs;
+    public short robotId;
 }
 
 public class DeathEvent: GameEvent
@@ -281,62 +282,67 @@ public class DeathEvent: GameEvent
     public DeathEvent() {
         type = EVENT_ID;
     }
-    public short robotId {get; set;}
-    public short returnHealth {get; set;}
+    public short robotId;
+    public short returnHealth;
+}
+
+[Serializable]
+public class SocketMessage {
+    public string name;
+}
+    
+[Serializable]
+public class StartGameMessage: SocketMessage
+{
+    public string myName;
+    public List<string> myRobots;
+}
+
+[Serializable]
+public class AcceptPlayerSessionMessage: SocketMessage
+{
+    public string playerSessionId;
+}
+    
+[Serializable]
+public class GameReadyMessage: SocketMessage
+{
+    public bool isPrimary;
+    public string opponentName;
+    public List<Robot> myTeam;
+    public List<Robot> opponentTeam;
+    public Map board;
+}
+    
+[Serializable]
+public class SubmitCommandsMessage: SocketMessage
+{
+    public List<Command> commands;
 }
 
 public class Messages {
-    public const short START_LOCAL_GAME = 1;
-    public const short START_GAME = 2;
-    public const short GAME_READY = 3;
-    public const short SUBMIT_COMMANDS = 4;
-    public const short TURN_EVENTS = 5;
-    public const short WAITING_COMMANDS = 6;
-    public const short SERVER_ERROR = 7;
-    public const short END_GAME = 8;
-    public const short ACCEPT_PLAYER_SESSION = 9;
-    public class AcceptPlayerSessionMessage
-    {
-        public string playerSessionId {get; set;}
-    }
-    public class StartLocalGameMessage
-    {
-        public string myName {get; set;}
-        public string opponentName {get; set;}
-        public string[] myRobots {get; set;}
-        public string[] opponentRobots {get; set;}
-    }
-    public class StartGameMessage
-    {
-        public string myName {get; set;}
-        public string[] myRobots {get; set;}
-    }
-    public class GameReadyMessage
-    {
-        public bool isPrimary {get; set;}
-        public string opponentname {get; set;}
-        public Robot[] myTeam {get; set;}
-        public Robot[] opponentTeam {get; set;}
-        public Map board {get; set;}
-    }
-    public class SubmitCommandsMessage
-    {
-        public Command[] commands {get; set;}
-        public string owner {get; set;}
-    }
+    
+    [Serializable]
     public class TurnEventsMessage
     {
-        public GameEvent[] events {get; set;}
-        public byte turn {get; set;}
+        public GameEvent[] events;
+        public byte turn;
     }
+    
+    [Serializable]
     public class OpponentWaitingMessage { }
+    
+    [Serializable]
     public class ServerErrorMessage
     {
-        public string serverMessage {get; set;}
-        public string exceptionType {get; set;}
-        public string exceptionMessage {get; set;}
+        public string serverMessage;
+        public string exceptionType;
+        public string exceptionMessage;
     }
+    
+    [Serializable]
     public class EndGameMessage { }
+    
     [Serializable]
     public class GameView {
         public string gameSessionId;
@@ -360,13 +366,4 @@ public class Messages {
     public class CreateGameResponse : GameSessionResponse { }
     [Serializable]
     public class JoinGameResponse : GameSessionResponse { }
-
-    [Serializable]
-    public class SocketMessageProps {}
-
-    [Serializable]
-    public class SocketMessage {
-        public string name;
-        public SocketMessageProps props;
-    }
 }

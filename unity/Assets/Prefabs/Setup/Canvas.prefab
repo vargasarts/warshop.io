@@ -129,13 +129,15 @@ MonoBehaviour:
   initialScene:
     sceneAsset: {fileID: 102900000, guid: 00ed4ba23fb052d42ba04200a91cf92d, type: 3}
     scenePath: Assets/Scenes/Initial.unity
+  matchScene:
+    sceneAsset: {fileID: 102900000, guid: c10f8832158223b4bb0598e23d14b19f, type: 3}
+    scenePath: Assets/Scenes/Match.unity
   robotDir:
   - {fileID: 21300000, guid: a794f0c1e485b3d4891ade21b8b7bebb, type: 3}
   - {fileID: 21300000, guid: fc45df0e25973924eb6b2c1701ebc9e2, type: 3}
   - {fileID: 21300000, guid: df95947940fa9044495db5cdabe8fce2, type: 3}
   - {fileID: 21300000, guid: 1b84e324f0b9d30488b92c816801d86f, type: 3}
   mySquadPanel: {fileID: 5822815822169411321}
-  opponentSquadPanel: {fileID: 5822815822674649599}
   statusModal: {fileID: 7921041803296458363}
   starText: {fileID: 7921041802586927689}
 --- !u!1001 &1178582227691900103
@@ -573,17 +575,6 @@ RectTransform:
 --- !u!114 &5822815822169411321 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5587010630367125817, guid: ee878a76479bd7046a55fc61e01e3a16, type: 3}
-  m_PrefabInstance: {fileID: 2109866825137500096}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6dae71838b7ac0e49a0decf218131246, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &5822815822674649599 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5587010630524096063, guid: ee878a76479bd7046a55fc61e01e3a16, type: 3}
   m_PrefabInstance: {fileID: 2109866825137500096}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}

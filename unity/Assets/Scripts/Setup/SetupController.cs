@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using System.Linq;
+using System.Collections.Generic;
 
 public class SetupController : MonoBehaviour
 {
@@ -12,9 +13,9 @@ public class SetupController : MonoBehaviour
     public RobotRosterPanelController robotRosterPanel;
     public SceneReference lobbyScene;
     public SceneReference initialScene;
+    public SceneReference matchScene;
     public Sprite[] robotDir;
     public SquadPanelController mySquadPanel;
-    public SquadPanelController opponentSquadPanel;
     public StatusModalController statusModal;
     public Text starText;
     
@@ -42,18 +43,12 @@ public class SetupController : MonoBehaviour
     {
         maximizedRosterRobot.Select(selectedRobot);
         mySquadPanel.squadPanelButton.interactable= true;
-        opponentSquadPanel.squadPanelButton.interactable=true;
     }
 
     public void AddSelectedToMySquad(SquadPanelController squadPanel)
     {
-        UpdateStarText();
         AddSelectedToSquad(squadPanel, RemoveAddedFromMySquad);
-    }
-
-    public void AddSelectedToOpponentSquad(SquadPanelController squadPanel)
-    {
-        AddSelectedToSquad(squadPanel, RemoveAddedFromOpponentSquad);
+        UpdateStarText();
     }
 
     public void AddSelectedToSquad(SquadPanelController squadPanel, UnityAction<RobotSquadImageController> removeCallback)
@@ -64,18 +59,12 @@ public class SetupController : MonoBehaviour
 
         maximizedRosterRobot.Hide();
         mySquadPanel.squadPanelButton.interactable =(false);
-        opponentSquadPanel.squadPanelButton.interactable =(false);
     }
 
     public void RemoveAddedFromMySquad(RobotSquadImageController robot)
     {
-        UpdateStarText();
         RemoveAddedFromSquad(robot, mySquadPanel);
-    }
-
-    public void RemoveAddedFromOpponentSquad(RobotSquadImageController robot)
-    {
-        RemoveAddedFromSquad(robot, opponentSquadPanel);
+        UpdateStarText();
     }
 
     public void RemoveAddedFromSquad(RobotSquadImageController robot, SquadPanelController panel)
@@ -87,8 +76,8 @@ public class SetupController : MonoBehaviour
     void StartGame()
     {
         statusModal.ShowLoading();
-        string[] myRosterStrings = mySquadPanel.GetSquadRobotNames();
-        BaseGameManager.SendPlayerInfo(myRosterStrings, ProfileController.username);
+        List<string> myRosterStrings = mySquadPanel.GetSquadRobotNames();
+        BaseGameManager.SendPlayerInfo(myRosterStrings, ProfileController.username, () => SceneManager.LoadScene(matchScene));
     }
 
     void UpdateStarText()
