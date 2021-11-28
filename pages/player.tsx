@@ -4,7 +4,7 @@ import Button from "@mui/material/Button";
 import type { Handler as GetGames } from "../functions/games/get";
 import type { Handler as CreateGame } from "../functions/game/post";
 import type { Handler as JoinGame } from "../functions/join/post";
-import type { Robot } from "../server/game";
+import type { Robot, RobotStats } from "../server/game";
 import type { Map } from "../server/map";
 
 type GameViews = Awaited<ReturnType<GetGames>>["gameViews"];
@@ -98,7 +98,13 @@ const LobbyScene = ({
   );
 };
 
-const SetupScene = ({ ws }: { ws: WebSocket }) => {
+const SetupScene = ({
+  ws,
+  myRoster,
+}: {
+  ws: WebSocket;
+  myRoster: RobotStats[];
+}) => {
   return (
     <div>
       <button
@@ -106,12 +112,7 @@ const SetupScene = ({ ws }: { ws: WebSocket }) => {
           ws.send(
             JSON.stringify({
               name: "START_GAME",
-              myRobots: [
-                "Bronze Grunt",
-                "Bronze Grunt",
-                "Silver Grunt",
-                "Silver Grunt",
-              ],
+              myRobots: myRoster.slice(0,4).map((r) => r.uuid),
               myName: PLAYER_ID,
             })
           )
@@ -119,6 +120,11 @@ const SetupScene = ({ ws }: { ws: WebSocket }) => {
       >
         Ready!
       </button>
+      <ul>
+        {myRoster.map((r) => (
+          <li key={r.uuid}>{r.name}</li>
+        ))}
+      </ul>
     </div>
   );
 };
@@ -147,19 +153,19 @@ const MatchScene = ({
   return (
     <div>
       <h1>
-        Playing against {opponentName} as {isPrimary}
+        Playing against {opponentName} as {`${isPrimary}`}
       </h1>
       <div style={{ display: "flex" }}>
         <div style={{ width: "50%" }}>
           <h2>Me</h2>
           {myTeam.map((r) => (
-            <div>{r.id}</div>
+            <div>{JSON.stringify(r)}</div>
           ))}
         </div>
         <div style={{ width: "50%" }}>
           <h2>Opponent</h2>
           {opponentTeam.map((r) => (
-            <div>{r.id}</div>
+            <div>{JSON.stringify(r)}</div>
           ))}
         </div>
       </div>
@@ -169,48 +175,56 @@ const MatchScene = ({
   );
 };
 
+type SetupProps = Omit<Parameters<typeof SetupScene>[0], "ws">;
 type MatchProps = Omit<Parameters<typeof MatchScene>[0], "ws">;
 
 const PlayerPage = (): React.ReactElement => {
   const [scene, setScene] = useState("lobby");
+  const [setupProps, setSetupProps] = useState<SetupProps>();
   const [matchProps, setMatchProps] = useState<MatchProps>();
   const websocketRef = useRef<WebSocket>();
-  return scene === "lobby" ? (
-    <LobbyScene
-      onJoin={({ ipAddress, playerSessionId = "", port }) => {
-        const ws = (websocketRef.current = new WebSocket(
-          `ws://${ipAddress}:${port}`
-        ));
-        ws.onmessage = ({ data }) => {
-          const { name, ...props } = JSON.parse(data);
-          if (name === "GAME_READY") {
-            setMatchProps(props);
-            setScene("match");
-          }
-        };
-        ws.onopen = () =>
-          ws.send(
-            JSON.stringify({
-              name: "ACCEPT_PLAYER_SESSION",
-              playerSessionId,
-            })
-          );
-        setScene("setup");
-      }}
-    />
-  ) : scene === "setup" ? (
-    <SetupScene
-      ws={
-        websocketRef.current || new WebSocket("")
-      }
-    />
-  ) : scene === "match" ? (
-    <MatchScene
-      {...(matchProps as Required<MatchProps>)}
-      ws={websocketRef.current || new WebSocket("")}
-    />
-  ) : (
-    <div>Invalid Scene: {scene}</div>
+  return (
+    <>
+      <style>{`body {\n  font-family: sans-serif;\n}`}</style>
+      {scene === "lobby" ? (
+        <LobbyScene
+          onJoin={({ ipAddress, playerSessionId = "", port }) => {
+            const ws = (websocketRef.current = new WebSocket(
+              `ws://${ipAddress}:${port}`
+            ));
+            ws.onmessage = ({ data }) => {
+              const { name, ...props } = JSON.parse(data);
+              if (name === "LOAD_SETUP") {
+                setSetupProps(props);
+                setScene("setup");
+              } else if (name === "GAME_READY") {
+                setMatchProps(props);
+                setScene("match");
+              }
+            };
+            ws.onopen = () =>
+              ws.send(
+                JSON.stringify({
+                  name: "ACCEPT_PLAYER_SESSION",
+                  playerSessionId,
+                })
+              );
+          }}
+        />
+      ) : scene === "setup" ? (
+        <SetupScene
+          {...(setupProps as Required<SetupProps>)}
+          ws={websocketRef.current || new WebSocket("")}
+        />
+      ) : scene === "match" ? (
+        <MatchScene
+          {...(matchProps as Required<MatchProps>)}
+          ws={websocketRef.current || new WebSocket("")}
+        />
+      ) : (
+        <div>Invalid Scene: {scene}</div>
+      )}
+    </>
   );
 };
 

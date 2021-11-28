@@ -19,7 +19,9 @@ const logic = () => {
         .map((g) => ({
           gameSessionId: g.GameSessionId,
           creatorId: g.CreatorId,
-          isPrivate: g.GameProperties?.some((gp) => gp.Key === "IsPrivate"),
+          isPrivate:
+            g.GameProperties?.find((gp) => gp.Key === "IsPrivate")?.Value ===
+            "False",
         })),
     }));
 };

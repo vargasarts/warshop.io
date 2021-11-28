@@ -13,6 +13,7 @@ public class LobbyController : MonoBehaviour
     public SceneReference setupScene;
     public StatusModalController statusModal;
     public VerticalLayoutGroup matches;
+    private bool loadSetup;
 
     void Start ()
     {
@@ -21,6 +22,14 @@ public class LobbyController : MonoBehaviour
         newGameSessionUI.SetUsername(ProfileController.username);
         newGameSessionUI.SetPlayCallback(NewGame);
         backButton.onClick.AddListener(LoadInitial);
+    }
+
+    void Update()
+    {
+        if (loadSetup) {
+            loadSetup = false;
+            SceneManager.LoadScene(setupScene);
+        }
     }
 
     void FindAvailableGamesCallback(Messages.GameView[] gameViews)
@@ -54,8 +63,7 @@ public class LobbyController : MonoBehaviour
 
     void SetupGame(string playerSessionId, string ipAddress, int port)
     {
-        BaseGameManager.Initialize(playerSessionId, ipAddress, port);
-        SceneManager.LoadScene(setupScene);
+        BaseGameManager.Initialize(playerSessionId, ipAddress, port, () => {loadSetup = true;}, Reject);
     }
 
     void DeactivateButtons()

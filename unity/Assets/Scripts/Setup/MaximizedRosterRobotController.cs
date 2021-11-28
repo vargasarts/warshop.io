@@ -11,22 +11,28 @@ public class MaximizedRosterRobotController : MonoBehaviour
     public TextMeshProUGUI healthField;
     public TextMeshProUGUI descriptionField;
     public Transform container;
+    private string uuid;
 
-    public void Select(Sprite robotSprite)
+    public void Select(Sprite robotSprite, RobotStats robot)
     {
         container.gameObject.SetActive(true);
 
         selectedRobot.sprite = robotSprite;
         nameField.text  = robotSprite.name;
-        Robot robot = Robot.create(robotSprite.name);
         attackField.text= robot.attack.ToString();
         healthField.text=robot.health.ToString();
-        descriptionField.text = robot.description;
+        uuid = robot.uuid;
+      //  descriptionField.text = robot.description;
     }
 
     public Sprite GetRobotSprite()
     {
         return selectedRobot.sprite;
+    }
+
+    public string GetUuid()
+    {
+        return uuid;
     }
 
     public void Hide()

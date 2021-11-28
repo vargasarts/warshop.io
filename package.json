@@ -23,6 +23,7 @@
     "@types/node": "^16.7.10",
     "@types/react": "^17.0.19",
     "@types/react-dom": "^17.0.9",
+    "@types/uuid": "^8.3.3",
     "@types/ws": "^8.2.0",
     "@typescript-eslint/eslint-plugin": "^4.30.0",
     "@typescript-eslint/parser": "^4.30.0",
@@ -43,6 +44,7 @@
     "aws-sdk-plus": "^0.4.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "uuid": "^8.3.2",
     "ws": "^8.2.3"
   }
 }

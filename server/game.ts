@@ -6,10 +6,19 @@ type Position = {
   y: number;
 }
 
+export type RobotStats = {
+  priority: number,
+  health: number,
+  attack: number,
+  name: string,
+  uuid: string,
+}
+
 export type Robot = {
   id: number,
   position: Position;
-}
+  startingHealth: number;
+} & RobotStats;
 
 type Player = {
   joined: boolean;

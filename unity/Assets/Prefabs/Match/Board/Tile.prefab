@@ -45,15 +45,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   battery: {fileID: 114516795605733698, guid: 9a3db92b6b120f8488d98c64b12fb5ff, type: 3}
-  queueMarker: {fileID: 1876748846819744, guid: 7d72de74c17c1bb45af234002e5af9e0,
-    type: 3}
+  queueMarker: {fileID: 1876748846819744, guid: 7d72de74c17c1bb45af234002e5af9e0, type: 3}
   baseTile: {fileID: 2100000, guid: 7aa1e75bf5e0e514a8c49e6e5cf91236, type: 2}
   userBaseTile: {fileID: 2100000, guid: c3954acba22942f4a87c3f2975fa9702, type: 2}
   opponentBaseTile: {fileID: 2100000, guid: 42bf17ec753258549ad282863832aad1, type: 2}
   opponentCore: {fileID: 2100000, guid: ac0a83a70d2fed145ae21860f0d34799, type: 2}
   meshRenderer: {fileID: 7922496788349816331}
-  spawnTileText: {fileID: 114021522439281750, guid: 6565701cfaec4cf4b81dbc922faf8695,
-    type: 3}
+  spawnTileText: {fileID: 114021522439281750, guid: 6565701cfaec4cf4b81dbc922faf8695, type: 3}
   animatorHelper: {fileID: 863625975502077193}
 --- !u!1 &408210176560288311
 GameObject:
@@ -118,6 +116,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -142,6 +141,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &1977396192979992539
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -159,7 +159,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 408210176560288311}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f27d0e74e04d195438f7f088e9251309, type: 3}
+  m_Script: {fileID: 11500000, guid: 6bb6d201f1893a64aa702310c8e0e77a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 2667459531506518680}

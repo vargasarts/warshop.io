@@ -3,7 +3,6 @@ using System;
 using UnityEngine;
 using UnityEngine.Events;
 using WebSocketSharp;
-using System.Linq;
 
 public class GameClient
 {
@@ -11,18 +10,16 @@ public class GameClient
     private int port;
     private string playerSessionId;
     private WebSocket ws;
+    protected Action<List<RobotStats>> OnSetupCallback;
     protected UnityAction<GameReadyMessage> OnGameReady;
     protected UnityAction<GameEvent[]> onTurnCallback;
 
-    public GameClient(string psid, string ipAddress, int p)
+    public GameClient(string psid, string ipAddress, int p, Action<List<RobotStats>> callback, UnityAction<string> reject)
     {
         playerSessionId = psid;
         ip = ipAddress;
         port = p;
-    }
-    
-    internal void ConnectToGameServer(UnityAction<string> errorCallback)
-    {
+        OnSetupCallback = callback;
         try
         {
             ws = new WebSocket("ws://" + ip + ":" + port);
@@ -30,22 +27,26 @@ public class GameClient
             {
                 SocketMessage message = JsonUtility.FromJson<SocketMessage>(e.Data);
                 switch(message.name) {
+                    case "LOAD_SETUP":
+                        OnSetup(JsonUtility.FromJson<LoadSetupMessage>(e.Data));
+                        break;
                     case "GAME_READY":
                         OnGameReady(JsonUtility.FromJson<GameReadyMessage>(e.Data));
                         break;
                     default:
-                        Console.WriteLine(e.Data);
+                        OnUnsupportedMessage(e.Data);
                         return;
                 }
             };
             ws.OnOpen += OnConnect;
+            ws.OnError += OnNetworkError;
             Debug.Log("Attempting to connect to " + ip + ":" + port);
             ws.Connect();
         }
         catch(Exception e)
         {
             Debug.LogError(e);
-            errorCallback("An unexpected error occurred! Please notify the developers.");
+            reject("An unexpected error occurred! Please notify the developers.");
         }
     }
 
@@ -60,10 +61,15 @@ public class GameClient
         ws.Send(JsonUtility.ToJson(msg));
     }
 
+    private void OnSetup(LoadSetupMessage msg)
+    {
+        OnSetupCallback(msg.myRoster);
+    }
+
     private void OnDisconnect()
     {
         Debug.Log("Disconnected");
-        ws.Connect();
+      //  ws.Connect();
     }
 
     internal void SendGameRequest(List<string> myRobots, string myname, UnityAction<List<Robot>, List<Robot>, string, Map> readyCallback, Action setupCallback)
@@ -73,7 +79,6 @@ public class GameClient
         msg.myRobots = myRobots;
         msg.name = "START_GAME";
         OnGameReady = (GameReadyMessage msg) => {
-            Debug.Log("READY!");
             readyCallback(msg.myTeam, msg.opponentTeam, msg.opponentName, msg.board);
             Debug.Log("LOAD SCENE!");
             setupCallback();
@@ -83,14 +88,16 @@ public class GameClient
     }
 
 
-    protected void OnUnsupportedMessage()//NetworkMessage netMsg)
+    protected void OnUnsupportedMessage(string data)
     {
-        Debug.Log("Unsupported message type: ");// + netMsg.msgType);
+        Debug.Log("Unsupported message: " + data);
     }
 
-    protected static void OnNetworkError()//NetworkMessage netMsg)
+    protected static void OnNetworkError(object sender, ErrorEventArgs e)
     {
-        Debug.Log("Network Error");
+        Debug.LogError("Network Error");
+        Debug.LogError(e.Message);
+        Debug.LogError(e.Exception);
     }
 
     protected void OnTurnEvents()//NetworkMessage netMsg)

@@ -7,35 +7,40 @@ using System.Linq;
 
 public class BaseGameManager
 {
-    protected BoardController boardController;
-    protected SetupController setupController;
-    protected Game.Player myPlayer;
-    protected Game.Player opponentPlayer;
-    protected GameClient gameClient;
-    protected UIController uiController;
-    protected Dictionary<short, RobotController> robotControllers;
+    private BoardController boardController;
+    private SetupController setupController;
+    private Game.Player myPlayer;
+    private Game.Player opponentPlayer;
+    private GameClient gameClient;
+    private UIController uiController;
+    private Dictionary<short, RobotController> robotControllers;
 
-    protected byte turnNumber = 1;
-    protected int currentHistoryIndex;
-    protected List<HistoryState> history = new List<HistoryState>();
-    protected Map board;
+    private byte turnNumber = 1;
+    private int currentHistoryIndex;
+    private List<HistoryState> history = new List<HistoryState>();
+    private Map board;
+    private List<RobotStats> roster;
+
     private static BaseGameManager instance;
 
-    public static void Initialize(string playerSessionId, string ipAddress, int port)
+    public static void Initialize(string playerSessionId, string ipAddress, int port, Action callback, UnityAction<string> reject)
     {
-        instance = new BaseGameManager(playerSessionId, ipAddress, port);
+        instance = new BaseGameManager(playerSessionId, ipAddress, port, callback, reject);
     }
 
-    public BaseGameManager(string playerSessionId, string ipAddress, int port) 
+    public BaseGameManager(string playerSessionId, string ipAddress, int port, Action callback, UnityAction<string> reject) 
     {
-        gameClient = new GameClient(playerSessionId, ipAddress, port);
+        gameClient = new GameClient(playerSessionId, ipAddress, port, (List<RobotStats> myRoster) => {
+            roster = myRoster;
+            callback();
+        }, reject);
     }
 
-    public static void InitializeSetup(SetupController sc)
+    public static List<RobotStats> InitializeSetup(SetupController sc)
     {
         instance.setupController = sc;
         sc.backButton.onClick.AddListener(sc.EnterLobby);
-        instance.gameClient.ConnectToGameServer(sc.statusModal.DisplayError);
+        return instance.roster;
     }
 
     public static void SendPlayerInfo(List<string> myRobotNames, string username, Action callback)
@@ -82,17 +87,21 @@ public class BaseGameManager
 
     public static void InitializeUI(UIController ui)
     {
+        Debug.Log("INITIALIZING");
         instance.uiController = ui;
         instance.uiController.InitializeUI(instance.myPlayer, instance.opponentPlayer);
+        Debug.Log("done with ui");
         instance.robotControllers.Keys.ToList().ForEach(k => instance.uiController.BindUiToRobotController(k, instance.robotControllers[k]));
+        Debug.Log("dun wit bots");
         instance.uiController.submitCommands.SetCallback(instance.SubmitCommands);
         instance.uiController.backToPresent.SetCallback(instance.BackToPresent);
         instance.uiController.stepForwardButton.SetCallback(instance.StepForward);
         instance.uiController.stepBackButton.SetCallback(instance.StepBackward);
         instance.history.Add(instance.SerializeState(1, GameConstants.MAX_PRIORITY));
+        Debug.Log("done initializing");
     }
 
-    protected void SubmitCommands()
+    private void SubmitCommands()
     {
         List<Command> commands = GetSubmittedCommands(robotControllers.Values.ToList());
         uiController.actionButtonContainer.SetButtons(false);
@@ -100,7 +109,7 @@ public class BaseGameManager
         gameClient.SendSubmitCommands(commands, myPlayer.name, PlayEvents);
     }
 
-    protected List<Command> GetSubmittedCommands(List<RobotController> robotsToSubmit)
+    private List<Command> GetSubmittedCommands(List<RobotController> robotsToSubmit)
     {
         uiController.LightUpPanel(true, true);
         List<Command> commands = robotsToSubmit.ConvertAll(AddCommands).SelectMany(x => x).ToList();
@@ -118,7 +127,7 @@ public class BaseGameManager
         return robot.commands;
     }
 
-    protected virtual void PlayEvent(GameEvent[] events, int index) 
+    private void PlayEvent(GameEvent[] events, int index) 
     {
         if (index == events.Length) {
             SetupNextTurn();
@@ -190,7 +199,7 @@ public class BaseGameManager
         else PlayEvent(events, index + 1);
     }
 
-    protected virtual void PlayEvents(GameEvent[] events)
+    private void PlayEvents(GameEvent[] events)
     {
         uiController.LightUpPanel(true, false);
         PlayEvent(events, 0);

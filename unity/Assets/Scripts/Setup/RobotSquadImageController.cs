@@ -6,19 +6,21 @@ public class RobotSquadImageController : MonoBehaviour
 {
     public Button removeButton;
     public Image robotImage;
+    private string uuid;
 
     public void SetRemoveCallback(UnityAction<RobotSquadImageController> callback)
     {
         removeButton.onClick.AddListener(() => callback(this));
     }
 
-    public void SetSprite(Sprite robotSprite)
+    public void SetSprite(Sprite robotSprite, string _uuid)
     {
         robotImage.sprite = robotSprite;
+        uuid = _uuid;
     }
 
-    public string GetName()
+    public string GetUuid()
     {
-        return robotImage.sprite.name;
+        return uuid;
     }
 }

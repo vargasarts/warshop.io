@@ -23,12 +23,12 @@ public class BoardController : MonoBehaviour
 
     public void InitializeBoard(Map board)
     {
-        allLocations = board.spaces.ToList().ConvertAll(InitializeTile);
+        allLocations = board.spaces.ConvertAll(InitializeTile);
 
         InitializeLights(board.width, board.height);
     }
 
-    public TileController InitializeTile(Map.Space s)
+    public TileController InitializeTile(Space s)
     {
         TileController currentCell = Instantiate(tile, new Vector2(s.x, s.y), Quaternion.identity, transform);
         currentCell.LoadTile(s, SetMyBattery, SetOpponentBattery);

@@ -18,15 +18,25 @@ public class SetupController : MonoBehaviour
     public SquadPanelController mySquadPanel;
     public StatusModalController statusModal;
     public Text starText;
+    private bool loadMatch;
     
     void Start ()
     {
-        BaseGameManager.InitializeSetup(this);
+        List<RobotStats> roster = BaseGameManager.InitializeSetup(this);
         
         mySquadPanel.SetAddCallback(AddSelectedToMySquad);
         startGameButton.onClick.AddListener(StartGame);
         robotRosterPanel.SetMaximizeCallback(maximizeSelection);
-        robotDir.ToList().ForEach(robotRosterPanel.AddRobotImage);
+        Dictionary<string,Sprite> spritesByName = robotDir.ToDictionary((s) => s.name);
+        roster.ForEach(r => robotRosterPanel.AddRobotImage(spritesByName[r.name], r));
+    }
+
+    void Update()
+    {
+        if (loadMatch) {
+            loadMatch = false;
+            SceneManager.LoadScene(matchScene);
+        }
     }
 
     public void EnterLobby()
@@ -39,9 +49,9 @@ public class SetupController : MonoBehaviour
         SceneManager.LoadScene(initialScene);
     }
 
-    public void maximizeSelection(Sprite selectedRobot)
+    public void maximizeSelection(Sprite selectedRobot, RobotStats robotStats)
     {
-        maximizedRosterRobot.Select(selectedRobot);
+        maximizedRosterRobot.Select(selectedRobot, robotStats);
         mySquadPanel.squadPanelButton.interactable= true;
     }
 
@@ -55,7 +65,7 @@ public class SetupController : MonoBehaviour
     {
         RobotSquadImageController addedRobot = squadPanel.AddRobotSquadImage();
         addedRobot.SetRemoveCallback(removeCallback);
-        addedRobot.SetSprite(maximizedRosterRobot.GetRobotSprite());
+        addedRobot.SetSprite(maximizedRosterRobot.GetRobotSprite(), maximizedRosterRobot.GetUuid());
 
         maximizedRosterRobot.Hide();
         mySquadPanel.squadPanelButton.interactable =(false);
@@ -76,8 +86,8 @@ public class SetupController : MonoBehaviour
     void StartGame()
     {
         statusModal.ShowLoading();
-        List<string> myRosterStrings = mySquadPanel.GetSquadRobotNames();
-        BaseGameManager.SendPlayerInfo(myRosterStrings, ProfileController.username, () => SceneManager.LoadScene(matchScene));
+        List<string> myRosterStrings = mySquadPanel.GetSquadRobotUuids();
+        BaseGameManager.SendPlayerInfo(myRosterStrings, ProfileController.username, () => {loadMatch = true;});
     }
 
     void UpdateStarText()

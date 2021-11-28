@@ -46,8 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animatorHelper: {fileID: 114650362912246978}
-  defaultModel: {fileID: 1175896210484362, guid: 0f0c5c7685f77af4fbf6c63bac0e02ae,
-    type: 3}
+  defaultModel: {fileID: 1175896210484362, guid: 0f0c5c7685f77af4fbf6c63bac0e02ae, type: 3}
   healthMeshRenderer: {fileID: 23364946913414654}
   attackMeshRenderer: {fileID: 23616210894304974}
   healthLabel: {fileID: 102736957411386890}
@@ -117,6 +116,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -141,6 +141,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!102 &102573961694724984
 TextMesh:
   serializedVersion: 3
@@ -224,7 +225,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1373162668494348}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f27d0e74e04d195438f7f088e9251309, type: 3}
+  m_Script: {fileID: 11500000, guid: 6bb6d201f1893a64aa702310c8e0e77a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 95451225254426060}
@@ -307,6 +308,7 @@ SpriteRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -389,6 +391,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -413,6 +416,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!102 &102736957411386890
 TextMesh:
   serializedVersion: 3
@@ -482,6 +486,7 @@ SpriteRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:

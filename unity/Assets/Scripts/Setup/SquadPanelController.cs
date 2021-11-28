@@ -28,9 +28,9 @@ public class SquadPanelController : MonoBehaviour
         squadRobots.Remove(removedRobot);
     }
 
-    public List<string> GetSquadRobotNames()
+    public List<string> GetSquadRobotUuids()
     {
-        return squadRobots.ConvertAll(r => r.GetName());
+        return squadRobots.ConvertAll(r => r.GetUuid());
     }
 
     public int GetNumRobots()

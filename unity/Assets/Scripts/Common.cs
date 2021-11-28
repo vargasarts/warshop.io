@@ -31,83 +31,36 @@ public class GameConstants
     public const byte DEFAULT_SPECIAL_POWER = 2;
 }
 
-public class Map 
-{
-    public int width { get; set; }
-    public int height { get; set; }
-    public Space[] spaces{ get; set; }
-    public abstract class Space {
-        public int x;
-        public int y;
-        public byte type;
-        
-        protected const byte VOID_ID = 0;
-        protected const byte BLANK_ID = 1;
-        protected const byte BATTERY_ID = 2;
-        protected const byte QUEUE_ID = 4;
-    }
-    public abstract class PlayerSpace : Space
-    {
-        protected bool isPrimary;
-
-        public bool GetIsPrimary()
-        {
-            return isPrimary;
-        }
-    }
-
-    public class Void : Space
-    {
-        public Void()
-        {
-            type = VOID_ID;
-        }
-    }
-
-    public class Blank : Space
-    {
-        public Blank()
-        {
-            type = BLANK_ID;
-        }
-    }
-
-    public class Battery : PlayerSpace
-    {
-        internal Battery(bool p)
-        {
-            isPrimary = p;
-            type = (byte)(isPrimary ? 2 : 3);
-        }
-    }
-
-    public class Queue : PlayerSpace
-    {
-        private byte index;
-        internal Queue(byte i, bool p)
-        {
-            index = i;
-            isPrimary = p;
-            type = (byte)((isPrimary ? 4:8) + index);
-        }
-
-        public byte GetIndex()
-        {
-            return index;
-        }
-
-    }
+[Serializable]
+public class Space {
+    public int x;
+    public int y;
+    public byte type;
 }
 
 [Serializable]
-public class Robot
+public class Map 
+{
+    public int width;
+    public int height;
+    public List<Space> spaces;
+}
+
+[Serializable]
+public class RobotStats
 {
     public string name;
-    public string description;
     public byte priority;
-    public short startingHealth;
     public short health;
     public short attack;
+    public string uuid;
+}
+
+[Serializable]
+public class Robot : RobotStats
+{
+    public string description;
+    public short startingHealth;
     public short id;
     internal Robot(string _name)
     {
@@ -129,11 +82,11 @@ public class Command
     public const byte MOVE_COMMAND_ID = 1;
     public const byte ATTACK_COMMAND_ID = 2;
     public const byte SPECIAL_COMMAND_ID = 3;
-    public short robotId { get; set; }
-    public string owner { get; set; }
-    public string display { get; set; }
-    public byte direction { get; set; }
-    public byte commandId { get; set; }
+    public short robotId;
+    public string owner;
+    public string display;
+    public byte direction;
+    public byte commandId;
     public Command(byte dir, byte id)
     {
         direction = dir;
@@ -202,10 +155,10 @@ public class Command
 }
 
 public class GameEvent {
-    public byte priority {get; set; }
+    public byte priority;
     public short primaryBatteryCost;
     public short secondaryBatteryCost;
-    public byte type { get; set; }
+    public byte type;
 }
 
 public class ResolveEvent : GameEvent {
@@ -302,6 +255,12 @@ public class StartGameMessage: SocketMessage
 public class AcceptPlayerSessionMessage: SocketMessage
 {
     public string playerSessionId;
+}
+    
+[Serializable]
+public class LoadSetupMessage: SocketMessage
+{
+    public List<RobotStats> myRoster;
 }
     
 [Serializable]

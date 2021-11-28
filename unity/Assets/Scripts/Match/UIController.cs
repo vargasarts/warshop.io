@@ -4,15 +4,16 @@ using UnityEngine.SceneManagement;
 using System.Linq;
 using System;
 using System.Collections.Generic;
+using TMPro;
 
 public class UIController : MonoBehaviour
 {
 	public Image opponentBackground;
     public RobotPanelsContainerController opponentsRobots;
-    public TextMesh opponentsPlayerName;
+    public TextMeshPro opponentsPlayerName;
     public Image myBackground;
     public RobotPanelsContainerController myRobots;
-    public TextMesh myPlayerName;
+    public TextMeshPro myPlayerName;
     public ButtonContainerController robotButtonContainer;
     public ButtonContainerController commandButtonContainer;
     public ButtonContainerController directionButtonContainer;
@@ -170,6 +171,7 @@ public class UIController : MonoBehaviour
     {
         bool isSpawn = commandName.Equals(Command.GetDisplay(Command.SPAWN_COMMAND_ID));
         byte dir = (byte) Command.byteToDirectionString.ToString().IndexOf(directionButton.name);
+        Debug.Log(dir);
         directionButton.SetSprite(isSpawn ? queueSprites[dir] : GetArrow(commandName));
         directionButton.SetCallback(() => DirectionButtonCallback(robotButton, robotController, commandName, dir));
         directionButton.spriteRenderer.transform.localRotation = Quaternion.Euler(Vector3.up * 180 + (isSpawn ? Vector3.zero : Vector3.forward * dir * 90));

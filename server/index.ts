@@ -5,7 +5,14 @@ import GameLiftServerAPI, {
 } from "@dplusic/gamelift-nodejs-serversdk";
 import { OnStartGameSessionDelegate } from "@dplusic/gamelift-nodejs-serversdk/dist/types/Server/ProcessParameters";
 import { createMap, NULL_VEC } from "./map";
-import { commandsToEvents, flip, Game, storeCommands } from "./game";
+import {
+  commandsToEvents,
+  flip,
+  Game,
+  RobotStats,
+  storeCommands,
+} from "./game";
+import { getRobotRosterByPlayerId, getRobotByUuid } from "./db";
 
 const port = Number(process.argv[2]) || 12345;
 const boardFile =
@@ -52,17 +59,32 @@ const onProcessTerminate = () => {
   process.exit(0);
 };
 
-const onAcceptPlayerSession = ({
-  playerSessionId,
-}: {
-  playerSessionId: string;
-}) => {
+const onAcceptPlayerSession = (
+  {
+    playerSessionId,
+  }: {
+    playerSessionId: string;
+  },
+  ws: WebSocket
+) => {
   return GameLiftServerAPI.AcceptPlayerSession(playerSessionId).then(
     (outcome) => {
       if (!outcome.Success) {
         console.error(outcome);
         return;
       }
+      GameLiftServerAPI.DescribePlayerSessions({
+        PlayerSessionId: playerSessionId,
+        Limit: 1,
+      })
+        .then((p) =>
+          getRobotRosterByPlayerId(
+            p.Result?.PlayerSessions?.[0]?.PlayerId || ""
+          )
+        )
+        .then((myRoster) =>
+          ws.send(JSON.stringify({ name: "LOAD_SETUP", myRoster }))
+        );
     }
   );
 };
@@ -72,7 +94,7 @@ const onStartGame = (
     myRobots,
     myName,
   }: {
-    myRobots: unknown[];
+    myRobots: string[];
     myName: string;
   },
   ws: WebSocket,
@@ -81,49 +103,52 @@ const onStartGame = (
   console.log("Client Starting Game");
 
   const isPrimary = !game.primary?.joined;
-  const robots = myRobots.map(() => {
-    const robot = {
-      // ...createRobot(r),
-      id: game.nextRobotId++,
-      position: NULL_VEC,
+  return Promise.all(myRobots.map(getRobotByUuid)).then((myRobots) => {
+    const robots = myRobots.map((r) => {
+      const robot = {
+        ...r,
+        id: game.nextRobotId++,
+        position: NULL_VEC,
+        startingHealth: r.health,
+      };
+      // game.board add to dock
+      return robot;
+    });
+    const player = {
+      name: myName,
+      joined: true,
+      ready: false,
+      ws,
+      team: robots,
     };
-    // game.board add to dock
-    return robot;
+    if (isPrimary) {
+      game.primary = player;
+    } else {
+      game.secondary = player;
+    }
+    if (game.primary?.joined && game.secondary?.joined) {
+      game.primary.ws.send(
+        JSON.stringify({
+          name: "GAME_READY",
+          isPrimary: true,
+          opponentName: game.secondary.name,
+          myTeam: game.primary.team,
+          opponentTeam: game.secondary.team,
+          board: game.board,
+        })
+      );
+      game.secondary.ws.send(
+        JSON.stringify({
+          name: "GAME_READY",
+          isPrimary: true,
+          opponentName: game.primary.name,
+          myTeam: game.secondary.team,
+          opponentTeam: game.primary.team,
+          board: game.board,
+        })
+      );
+    }
   });
-  const player = {
-    name: myName,
-    joined: true,
-    ready: false,
-    ws,
-    team: robots,
-  };
-  if (isPrimary) {
-    game.primary = player;
-  } else {
-    game.secondary = player;
-  }
-  if (game.primary?.joined && game.secondary?.joined) {
-    game.primary.ws.send(
-      JSON.stringify({
-        name: "GAME_READY",
-        isPrimary: true,
-        opponentName: game.secondary.name,
-        myTeam: game.primary.team,
-        opponentTeam: game.secondary.team,
-        board: game.board,
-      })
-    );
-    game.secondary.ws.send(
-      JSON.stringify({
-        name: "GAME_READY",
-        isPrimary: true,
-        opponentName: game.primary.name,
-        myTeam: game.secondary.team,
-        opponentTeam: game.primary.team,
-        board: game.board,
-      })
-    );
-  }
 };
 
 const onSubmitCommands = (
@@ -211,7 +236,6 @@ if (outcome.Success) {
         console.error("- error:", e);
       }
     });
-    console.log("client connected!", ws.url);
   });
   wss.on("listening", () => {
     console.log(`listening on ${port}`);

@@ -17,7 +17,7 @@ const logic = ({
     .then((gameSession) => {
       const props = gameSession.GameSessions?.[0]?.GameProperties || [];
       const isPrivate =
-        props.find((g) => g.Key === "IsPrivate")?.Value === "true";
+        props.find((g) => g.Key === "IsPrivate")?.Value === "True";
       const gamePassword = props.find((g) => g.Key === "Password")?.Value || "";
       if (isPrivate && password !== gamePassword) {
         throw new UnauthorizedError(
@@ -32,9 +32,9 @@ const logic = ({
         .promise();
     })
     .then((r) => ({
-      playerSessionId: r.PlayerSession.PlayerSessionId,
-      ipAddress: r.PlayerSession.IpAddress,
-      port: r.PlayerSession.Port,
+      playerSessionId: r.PlayerSession?.PlayerSessionId,
+      ipAddress: r.PlayerSession?.IpAddress,
+      port: r.PlayerSession?.Port,
     }));
 
 export const handler = createAPIGatewayProxyHandler(logic);
