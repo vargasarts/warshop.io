@@ -44,9 +44,7 @@ const mockRobot = () => {
 export const getRobotRosterByPlayerId = (
   playerId: string
 ): Promise<RobotStats[]> => {
-  if (playerId === "Vargas") {
-    return Promise.resolve(Array.from({ length: 8 }, mockRobot));
-  } else if (playerId) {
+  if (playerId) {
     return Promise.resolve(Array.from({ length: 6 }, mockRobot));
   } else {
     return Promise.resolve([]);

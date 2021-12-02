@@ -8,13 +8,14 @@ import { createMap, NULL_VEC } from "./map";
 import {
   commandsToEvents,
   flip,
+  Command,
   Game,
-  RobotStats,
   storeCommands,
 } from "./game";
 import { getRobotRosterByPlayerId, getRobotByUuid } from "./db";
 
 const port = Number(process.argv[2]) || 12345;
+const MAX_BATTERY = 256;
 const boardFile =
   "8 5\nA W W W W W W a\nB W W W W W W b\nW P W W W W p W\nC W W W W W W c\nD W W W W W W d";
 const game: Game = {
@@ -22,6 +23,8 @@ const game: Game = {
   board: createMap(boardFile),
   gameSessionId: "",
   nextRobotId: 0,
+  turn: 0,
+  history: {},
 };
 
 const onGameSession: OnStartGameSessionDelegate = (gameSession) => {
@@ -120,6 +123,7 @@ const onStartGame = (
       ready: false,
       ws,
       team: robots,
+      battery: MAX_BATTERY,
     };
     if (isPrimary) {
       game.primary = player;
@@ -152,36 +156,36 @@ const onStartGame = (
 };
 
 const onSubmitCommands = (
-  { owner, commands }: { owner: string; commands: unknown[] },
+  { commands }: { commands: Command[] },
   ws: WebSocket,
   game: Game
 ) => {
   console.log("Client Submitting Commands");
   try {
     const p =
-      game.primary?.name === owner
+      game.primary?.ws === ws
         ? game.primary
-        : game.secondary?.name === owner
+        : game.secondary?.ws === ws
         ? game.secondary
         : null;
-    if (p) storeCommands(p, commands);
+    if (p) storeCommands(game, p, commands);
     if (game.primary?.ready && game.secondary?.ready) {
-      const events = commandsToEvents(game);
-      const props = { events, turn: game.turn };
+      const events = commandsToEvents(game as Required<Game>);
       game.primary.ws.send(
         JSON.stringify({
           name: "TURN_EVENTS",
-          props,
+          events, turn: game.turn,
         })
       );
       game.secondary.ws.send(
         JSON.stringify({
           name: "TURN_EVENTS",
-          props: flip(props),
+          events: flip(events),
+          turn: game.turn
         })
       );
     } else {
-      ws.send(JSON.stringify({ name: "WAITING_COMMANDS", props: {} }));
+      ws.send(JSON.stringify({ name: "WAITING_COMMANDS" }));
     }
   } catch (err) {
     const e = err as Error;
