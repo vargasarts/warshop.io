@@ -32,21 +32,6 @@ public class GameConstants
 }
 
 [Serializable]
-public class Space {
-    public int x;
-    public int y;
-    public byte type;
-}
-
-[Serializable]
-public class Map 
-{
-    public int width;
-    public int height;
-    public List<Space> spaces;
-}
-
-[Serializable]
 public class RobotStats
 {
     public string name;
@@ -239,6 +224,35 @@ public class DeathEvent: GameEvent
     public short returnHealth;
 }
 
+// EVERYTHING ABOVE IS DEPRECATED
+[Serializable]
+public class Space {
+    public int x;
+    public int y;
+    public byte type;
+}
+
+[Serializable]
+public class BatterySpace: Space {
+    public const byte ID = 2;
+    public bool isPrimary;
+}
+
+[Serializable]
+public class QueueSpace: Space {
+    public const byte ID = 4;  
+    public bool isPrimary;
+    public short index;
+}
+
+[Serializable]
+public class Map 
+{
+    public int width;
+    public int height;
+    public List<Space> spaces;
+}
+
 [Serializable]
 public class SocketMessage {
     public string name;
@@ -278,51 +292,37 @@ public class SubmitCommandsMessage: SocketMessage
 {
     public List<Command> commands;
 }
+    
+[Serializable]
+public class GameView {
+    public string gameSessionId;
+    public string creatorId;
+    public bool isPrivate;
+}
 
-public class Messages {
-    
-    [Serializable]
-    public class TurnEventsMessage
-    {
-        public GameEvent[] events;
-        public byte turn;
-    }
-    
-    [Serializable]
-    public class OpponentWaitingMessage { }
-    
-    [Serializable]
-    public class ServerErrorMessage
-    {
-        public string serverMessage;
-        public string exceptionType;
-        public string exceptionMessage;
-    }
-    
-    [Serializable]
-    public class EndGameMessage { }
-    
-    [Serializable]
-    public class GameView {
-        public string gameSessionId;
-        public string creatorId;
-        public bool isPrivate;
-    }
+[Serializable]
+public class EndGameMessage { }
 
-    [Serializable]
-    public class GetGamesResponse {
-        public GameView[] gameViews;
-    }
+[Serializable]
+public class GetGamesResponse {
+    public GameView[] gameViews;
+}
 
-    [Serializable]
-    public class GameSessionResponse
-    {
-        public string playerSessionId;
-        public string ipAddress;
-        public int port;
-    }
-    [Serializable]
-    public class CreateGameResponse : GameSessionResponse { }
-    [Serializable]
-    public class JoinGameResponse : GameSessionResponse { }
+[Serializable]
+public class GameSessionResponse
+{
+    public string playerSessionId;
+    public string ipAddress;
+    public int port;
+}
+[Serializable]
+public class CreateGameResponse : GameSessionResponse { }
+[Serializable]
+public class JoinGameResponse : GameSessionResponse { }
+
+[Serializable]
+public class TurnEventsMessage
+{
+    public GameEvent[] events;
+    public byte turn;
 }

@@ -23,17 +23,17 @@ public class TileController : MonoBehaviour
     {
         primaryBatterySetterCallback = primaryCallback;
         secondaryBatterySetterCallback = secondaryCallback;
-        if (s.type >=2 && s.type <= 3) LoadBatteryTile(s, s.type == 2);
-        else if (s.type >= 4) LoadQueueTile(s, s.type < 8, s.type - (s.type < 8 ? 4 : 8));
+        if (s.type == BatterySpace.ID) LoadBatteryTile((BatterySpace)s);
+        else if (s.type >= QueueSpace.ID) LoadQueueTile((QueueSpace)s);
     }
 
-    public void LoadBatteryTile(Space s, bool isPrimary)
+    public void LoadBatteryTile(BatterySpace s)
     {
         BatteryController newBattery = Instantiate(battery, transform.parent);
         newBattery.transform.localRotation = Quaternion.Euler(Vector3.left * 90);
         newBattery.transform.position = transform.position;
 
-        if (isPrimary)
+        if (s.isPrimary)
         {
             primaryBatterySetterCallback(newBattery);
         }
@@ -45,12 +45,12 @@ public class TileController : MonoBehaviour
         }
     }
 
-    public void LoadQueueTile(Space s, bool isPrimary, int index)
+    public void LoadQueueTile(QueueSpace s)
     {
         TextMeshPro spawnText = Instantiate(spawnTileText, transform);
-        spawnText.text = (index + 1).ToString();
+        spawnText.text = (s.index + 1).ToString();
         spawnText.transform.localPosition = Vector3.back * 0.101f;
-        spawnText.color = isPrimary ? userColor : opponentColor;
+        spawnText.color = s.isPrimary ? userColor : opponentColor;
     }
 
     public void LoadRobotOnTileMesh(bool isOpponent)

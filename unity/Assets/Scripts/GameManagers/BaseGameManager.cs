@@ -87,18 +87,14 @@ public class BaseGameManager
 
     public static void InitializeUI(UIController ui)
     {
-        Debug.Log("INITIALIZING");
         instance.uiController = ui;
         instance.uiController.InitializeUI(instance.myPlayer, instance.opponentPlayer);
-        Debug.Log("done with ui");
         instance.robotControllers.Keys.ToList().ForEach(k => instance.uiController.BindUiToRobotController(k, instance.robotControllers[k]));
-        Debug.Log("dun wit bots");
         instance.uiController.submitCommands.SetCallback(instance.SubmitCommands);
         instance.uiController.backToPresent.SetCallback(instance.BackToPresent);
         instance.uiController.stepForwardButton.SetCallback(instance.StepForward);
         instance.uiController.stepBackButton.SetCallback(instance.StepBackward);
         instance.history.Add(instance.SerializeState(1, GameConstants.MAX_PRIORITY));
-        Debug.Log("done initializing");
     }
 
     private void SubmitCommands()

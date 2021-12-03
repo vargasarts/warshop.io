@@ -32,7 +32,7 @@ public class LobbyController : MonoBehaviour
         }
     }
 
-    void FindAvailableGamesCallback(Messages.GameView[] gameViews)
+    void FindAvailableGamesCallback(GameView[] gameViews)
     {
         gameSessionUIs = gameViews.ToList().ConvertAll(g => CreateGameSessionUi(g.gameSessionId, g.creatorId, g.isPrivate)).ToArray();
     }

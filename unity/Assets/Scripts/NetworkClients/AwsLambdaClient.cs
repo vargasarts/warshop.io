@@ -29,7 +29,7 @@ public class AwsLambdaClient
         }
         else
         {
-            Messages.CreateGameResponse res = JsonUtility.FromJson<Messages.CreateGameResponse>(www.downloadHandler.text);
+            CreateGameResponse res = JsonUtility.FromJson<CreateGameResponse>(www.downloadHandler.text);
             callback(res.playerSessionId, res.ipAddress, res.port);
         }
         www.Dispose();
@@ -53,19 +53,19 @@ public class AwsLambdaClient
         }
         else
         {
-            Messages.JoinGameResponse res = JsonUtility.FromJson<Messages.JoinGameResponse>(www.downloadHandler.text);
+            JoinGameResponse res = JsonUtility.FromJson<JoinGameResponse>(www.downloadHandler.text);
             callback(res.playerSessionId, res.ipAddress, res.port);
         }
         www.Dispose();
     }
 
-    public static void SendFindAvailableGamesRequest(UnityAction<Messages.GameView[]> callback, UnityAction<string> reject)
+    public static void SendFindAvailableGamesRequest(UnityAction<GameView[]> callback, UnityAction<string> reject)
     {
         UnityWebRequest www = UnityWebRequest.Get(GATEWAY_URL + "/games");
         www.SendWebRequest().completed += (op) => FindAvailableGamesResponse(www, callback, reject);
     }
 
-    private static void FindAvailableGamesResponse(UnityWebRequest www, UnityAction<Messages.GameView[]> callback, UnityAction<string> reject)
+    private static void FindAvailableGamesResponse(UnityWebRequest www, UnityAction<GameView[]> callback, UnityAction<string> reject)
     {
         if (www.result == UnityWebRequest.Result.ConnectionError || www.result == UnityWebRequest.Result.ProtocolError)
         {
@@ -73,7 +73,7 @@ public class AwsLambdaClient
         }
         else
         {
-            Messages.GetGamesResponse res = JsonUtility.FromJson<Messages.GetGamesResponse>(www.downloadHandler.text);
+            GetGamesResponse res = JsonUtility.FromJson<GetGamesResponse>(www.downloadHandler.text);
             callback(res.gameViews);
         }
         www.Dispose();

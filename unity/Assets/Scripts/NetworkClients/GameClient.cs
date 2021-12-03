@@ -80,7 +80,6 @@ public class GameClient
         msg.name = "START_GAME";
         OnGameReady = (GameReadyMessage msg) => {
             readyCallback(msg.myTeam, msg.opponentTeam, msg.opponentName, msg.board);
-            Debug.Log("LOAD SCENE!");
             setupCallback();
         };
         
