@@ -23,8 +23,8 @@ public class TileController : MonoBehaviour
     {
         primaryBatterySetterCallback = primaryCallback;
         secondaryBatterySetterCallback = secondaryCallback;
-        if (s.type == BatterySpace.ID) LoadBatteryTile((BatterySpace)s);
-        else if (s.type >= QueueSpace.ID) LoadQueueTile((QueueSpace)s);
+        if (s.type == BatterySpace.ID) LoadBatteryTile(JsonUtility.FromJson<BatterySpace>(s.json));
+        else if (s.type >= QueueSpace.ID) LoadQueueTile(JsonUtility.FromJson<QueueSpace>(s.json));
     }
 
     public void LoadBatteryTile(BatterySpace s)

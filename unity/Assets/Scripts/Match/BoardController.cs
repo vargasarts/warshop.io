@@ -28,8 +28,10 @@ public class BoardController : MonoBehaviour
         InitializeLights(board.width, board.height);
     }
 
-    public TileController InitializeTile(Space s)
+    public TileController InitializeTile(string json)
     {
+        Space s = JsonUtility.FromJson<Space>(json);
+        s.json = json;
         TileController currentCell = Instantiate(tile, new Vector2(s.x, s.y), Quaternion.identity, transform);
         currentCell.LoadTile(s, SetMyBattery, SetOpponentBattery);
         return currentCell;

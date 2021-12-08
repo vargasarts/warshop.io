@@ -530,8 +530,3 @@ export const commandsToEvents = (game: LiveGame): GameEvent[] => {
 
   return events;
 };
-
-export const flipEvent = (event: GameEvent): GameEvent => event;
-
-export const flip = (events: GameEvent[]): GameEvent[] =>
-  events.map((e) => flipEvent(e));

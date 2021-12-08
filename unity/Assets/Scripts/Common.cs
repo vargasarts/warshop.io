@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class Game
 {
@@ -230,6 +231,7 @@ public class Space {
     public int x;
     public int y;
     public byte type;
+    public string json;
 }
 
 [Serializable]
@@ -250,7 +252,7 @@ public class Map
 {
     public int width;
     public int height;
-    public List<Space> spaces;
+    public List<string> spaces;
 }
 
 [Serializable]

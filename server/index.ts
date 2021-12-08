@@ -5,13 +5,7 @@ import GameLiftServerAPI, {
 } from "@dplusic/gamelift-nodejs-serversdk";
 import { OnStartGameSessionDelegate } from "@dplusic/gamelift-nodejs-serversdk/dist/types/Server/ProcessParameters";
 import { createMap, NULL_VEC } from "./map";
-import {
-  commandsToEvents,
-  flip,
-  Command,
-  Game,
-  storeCommands,
-} from "./game";
+import { commandsToEvents, Command, Game, storeCommands } from "./game";
 import { getRobotRosterByPlayerId, getRobotByUuid } from "./db";
 
 const port = Number(process.argv[2]) || 12345;
@@ -131,24 +125,29 @@ const onStartGame = (
       game.secondary = player;
     }
     if (game.primary?.joined && game.secondary?.joined) {
+      const commonProps = {
+        name: "GAME_READY",
+        board: {
+          ...game.board,
+          spaces: game.board.spaces.map((s) => JSON.stringify(s)),
+        },
+      };
       game.primary.ws.send(
         JSON.stringify({
-          name: "GAME_READY",
+          ...commonProps,
           isPrimary: true,
           opponentName: game.secondary.name,
           myTeam: game.primary.team,
           opponentTeam: game.secondary.team,
-          board: game.board,
         })
       );
       game.secondary.ws.send(
         JSON.stringify({
-          name: "GAME_READY",
-          isPrimary: true,
+          ...commonProps,
+          isPrimary: false,
           opponentName: game.primary.name,
           myTeam: game.secondary.team,
           opponentTeam: game.primary.team,
-          board: game.board,
         })
       );
     }
@@ -174,14 +173,15 @@ const onSubmitCommands = (
       game.primary.ws.send(
         JSON.stringify({
           name: "TURN_EVENTS",
-          events, turn: game.turn,
+          events,
+          turn: game.turn,
         })
       );
       game.secondary.ws.send(
         JSON.stringify({
           name: "TURN_EVENTS",
-          events: flip(events),
-          turn: game.turn
+          events,
+          turn: game.turn,
         })
       );
     } else {
