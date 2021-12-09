@@ -13,11 +13,11 @@ TagManager:
   - UI
   - 
   - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - MyPanel
+  - OpponentPanel
+  - Controls
+  - Board
+  - Selected
   - 
   - 
   - 

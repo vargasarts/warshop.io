@@ -33,7 +33,7 @@ public class RobotPanelsContainerController : MonoBehaviour
         List<short> robotIds = robotIdToPanels.Keys.ToList();
         robotIds.Sort();
         int i = robotIds.IndexOf(r.id);
-        panel.transform.localPosition = Vector3.right * (1.0f/robotIdToPanels.Count * (i + 0.5f) - 0.5f);
+        panel.transform.localPosition = Vector3.right * (1.0f/4 * (i + 0.5f) - 0.5f);
     }
 
     public void BindCommandClickCallback(RobotController r, UnityAction<RobotController, int> clickCallback)

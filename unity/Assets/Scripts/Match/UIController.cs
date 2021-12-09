@@ -18,10 +18,6 @@ public class UIController : MonoBehaviour
     public ButtonContainerController commandButtonContainer;
     public ButtonContainerController directionButtonContainer;
     public ButtonContainerController actionButtonContainer;
-    public LayerMask boardLayer;
-    public LayerMask selectedLayer;
-    public LayerMask myPlayerLayer;
-    public LayerMask opponentPlayerLayer;
     public MenuItemController submitCommands;
     public MenuItemController stepBackButton;
     public MenuItemController stepForwardButton;
@@ -96,6 +92,7 @@ public class UIController : MonoBehaviour
 
     public void InitializeUI(Game.Player myPlayer, Game.Player opponentPlayer)
     {
+        Debug.Log("Initialize UI");
         SetOpponentPlayerPanel(opponentPlayer);
         SetMyPlayerPanel(myPlayer);
 
@@ -112,16 +109,16 @@ public class UIController : MonoBehaviour
     private void SetOpponentPlayerPanel(Game.Player player)
     {
         opponentsPlayerName.text = player.name;
-        SetPlayerPanel(player, opponentsRobots, opponentPlayerLayer);
+        SetPlayerPanel(player, opponentsRobots, "OpponentPanel");
     }
 
     private void SetMyPlayerPanel(Game.Player player)
     {
         myPlayerName.text = player.name;
-        SetPlayerPanel(player, myRobots, myPlayerLayer);
+        SetPlayerPanel(player, myRobots, "MyPanel");
     }
 
-    void SetPlayerPanel(Game.Player player, RobotPanelsContainerController container, LayerMask layer)
+    void SetPlayerPanel(Game.Player player, RobotPanelsContainerController container, string layer)
     {
         container.Initialize(player.team.Count);
         player.team.ForEach(container.AddPanel);
@@ -151,9 +148,9 @@ public class UIController : MonoBehaviour
     private void RobotButtonSelect(MenuItemController robotButton, RobotController robotController)
     {
         robotButtonContainer.SetButtons(true);
-        ChangeLayer(selectedRobotController, boardLayer);
+        ChangeLayer(selectedRobotController, "Board");
         robotButton.Select();
-        ChangeLayer(robotController, selectedLayer);
+        ChangeLayer(robotController, "Selected");
         selectedRobotController = robotController;
         robotController.ShowMenuOptions(commandButtonContainer);
         directionButtonContainer.SetButtons(false);
@@ -170,8 +167,7 @@ public class UIController : MonoBehaviour
     private void EachDirectionButton(MenuItemController directionButton, MenuItemController robotButton, RobotController robotController, string commandName)
     {
         bool isSpawn = commandName.Equals(Command.GetDisplay(Command.SPAWN_COMMAND_ID));
-        byte dir = (byte) Command.byteToDirectionString.ToString().IndexOf(directionButton.name);
-        Debug.Log(dir);
+        byte dir = (byte) Command.byteToDirectionString.ToList().IndexOf(directionButton.name);
         directionButton.SetSprite(isSpawn ? queueSprites[dir] : GetArrow(commandName));
         directionButton.SetCallback(() => DirectionButtonCallback(robotButton, robotController, commandName, dir));
         directionButton.spriteRenderer.transform.localRotation = Quaternion.Euler(Vector3.up * 180 + (isSpawn ? Vector3.zero : Vector3.forward * dir * 90));
@@ -251,17 +247,17 @@ public class UIController : MonoBehaviour
 
     public void ChangeToBoardLayer(RobotController r)
     {
-        ChangeLayer(r, boardLayer);
+        ChangeLayer(r, "Board");
     }
 
-    private void ChangeLayer(RobotController r, int l)
+    private void ChangeLayer(RobotController r, string l)
     {
         if (r != null) ChangeLayer(r.gameObject, l);
     }
 
-    private void ChangeLayer(GameObject g, int l)
+    private void ChangeLayer(GameObject g, string l)
     {
-        ChangeLayerHelper(g, (int)Math.Log(l));
+        ChangeLayerHelper(g, LayerMask.NameToLayer(l));
     }
 
     private void ChangeLayerHelper(GameObject g, int l)

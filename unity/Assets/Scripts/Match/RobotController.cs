@@ -23,7 +23,7 @@ public class RobotController : MonoBehaviour
     public void LoadModel(string n, short i)
     {
         id = i;
-        GameObject model = new List<GameObject>(robotModels).Find(g => g.name.Replace(" ", "").Equals(n));
+        GameObject model = new List<GameObject>(robotModels).Find(g => g.name.Equals(n));
         if (model == null) model = defaultModel;
         GameObject baseModel = Instantiate(model, animatorHelper.transform);
     }
