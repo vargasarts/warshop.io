@@ -229,6 +229,7 @@ if (outcome.Success) {
     ws.on("message", (data) => {
       try {
         const { name, ...props } = JSON.parse(data.toString());
+        console.log(name, props);
         MESSAGE_HANDLERS[name as keyof typeof MESSAGE_HANDLERS](
           props,
           ws,

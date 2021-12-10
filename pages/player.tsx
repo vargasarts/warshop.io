@@ -4,7 +4,7 @@ import Button from "@mui/material/Button";
 import type { Handler as GetGames } from "../functions/games/get";
 import type { Handler as CreateGame } from "../functions/game/post";
 import type { Handler as JoinGame } from "../functions/join/post";
-import type { Robot, RobotStats } from "../server/game";
+import type { Robot, RobotStats, Command } from "../server/game";
 import type { Map } from "../server/map";
 
 type GameViews = Awaited<ReturnType<GetGames>>["gameViews"];
@@ -112,7 +112,7 @@ const SetupScene = ({
           ws.send(
             JSON.stringify({
               name: "START_GAME",
-              myRobots: myRoster.slice(0,4).map((r) => r.uuid),
+              myRobots: myRoster.slice(0, 4).map((r) => r.uuid),
               myName: PLAYER_ID,
             })
           )
@@ -125,6 +125,24 @@ const SetupScene = ({
           <li key={r.uuid}>{r.name}</li>
         ))}
       </ul>
+    </div>
+  );
+};
+
+const RobotComponent = (r: Robot) => {
+  return (
+    <div>
+      <hr />
+      <h4>{r.name}</h4>
+      <p>
+        <b>Attack:</b> {r.attack}
+      </p>
+      <p>
+        <b>Health:</b> {r.health}
+      </p>
+      <p>
+        <b>Priority:</b> {r.priority}
+      </p>
     </div>
   );
 };
@@ -144,12 +162,14 @@ const MatchScene = ({
   board: Map;
   ws: WebSocket;
 }) => {
+  const commands = useRef<Command[]>([]);
   useEffect(() => {
     ws.onmessage = ({ data }) => {
       const { name, props } = JSON.parse(data);
       console.log(name, props);
     };
   }, []);
+  const [command, setCommand] = useState<Record<string, string>>({});
   return (
     <div>
       <h1>
@@ -159,13 +179,48 @@ const MatchScene = ({
         <div style={{ width: "50%" }}>
           <h2>Me</h2>
           {myTeam.map((r) => (
-            <div>{JSON.stringify(r)}</div>
+            <>
+              <RobotComponent {...r} key={r.uuid} />
+              <div style={{ height: 24 }}>
+                <input
+                  value={command[r.id] || ""}
+                  onChange={(e) =>
+                    setCommand({ ...command, [r.id]: e.target.value })
+                  }
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      commands.current.push({
+                        robotId: r.id,
+                        commandId: Number(command[0]),
+                        direction: Number(command[1]),
+                      });
+                      setCommand({ ...command, [r.id]: "" });
+                    }
+                  }}
+                />
+              </div>
+            </>
           ))}
+          <button
+            onClick={() => {
+              ws.send(
+                JSON.stringify({
+                  name: "SUBMIT_COMMANDS",
+                  commands: commands.current,
+                })
+              );
+            }}
+          >
+            Submit
+          </button>
         </div>
         <div style={{ width: "50%" }}>
           <h2>Opponent</h2>
           {opponentTeam.map((r) => (
-            <div>{JSON.stringify(r)}</div>
+            <>
+              <RobotComponent {...r} key={r.uuid} />
+              <div style={{ height: 24 }} />
+            </>
           ))}
         </div>
       </div>

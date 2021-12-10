@@ -51,15 +51,15 @@ public class RobotController : MonoBehaviour
     {
         if (!isSpawned && commands.Count == 0)
         {
-            Command.TYPES.ToList().ForEach(t => m.GetByName(Command.GetDisplay(t)).SetActive(t == Command.SPAWN_COMMAND_ID));
+            Command.TYPES.ToList().ForEach(t => m.GetByName(Command.GetDisplay[t]).SetActive(t == Command.SPAWN_COMMAND_ID));
         }
         else
         {
             Command.TYPES.ToList().ForEach(t =>
             {
                 int num = GetNumCommandType(t);
-                bool active = num < Command.limit[t] && !t.Equals(typeof(Command.Spawn));
-                MenuItemController item = m.GetByName(Command.GetDisplay(t));
+                bool active = num < Command.limit[t] && t!=Command.SPAWN_COMMAND_ID;
+                MenuItemController item = m.GetByName(Command.GetDisplay[t]);
                 item.SetActive(active);
             });
         }
@@ -67,17 +67,17 @@ public class RobotController : MonoBehaviour
 
     internal void AddRobotCommand(string name, byte dir, UnityAction<Command, short, bool> callback)
     {
-        if (name.Equals(Command.GetDisplay(Command.SPAWN_COMMAND_ID)))
+        if (name.Equals(Command.GetDisplay[Command.SPAWN_COMMAND_ID]))
         {
-            AddRobotCommand(new Command.Spawn(dir), callback);
+            AddRobotCommand(new Command(dir, Command.SPAWN_COMMAND_ID), callback);
         }
-        else if (name.Equals(Command.GetDisplay(Command.MOVE_COMMAND_ID)))
+        else if (name.Equals(Command.GetDisplay[Command.MOVE_COMMAND_ID]))
         {
-            AddRobotCommand(new Command.Move(dir), callback);
+            AddRobotCommand(new Command(dir, Command.MOVE_COMMAND_ID), callback);
         }
-        else if (name.Equals(Command.GetDisplay(Command.ATTACK_COMMAND_ID)))
+        else if (name.Equals(Command.GetDisplay[Command.ATTACK_COMMAND_ID]))
         {
-            AddRobotCommand(new Command.Attack(dir), callback);
+            AddRobotCommand(new Command(dir, Command.ATTACK_COMMAND_ID), callback);
         }
     }
 

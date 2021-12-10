@@ -68,14 +68,16 @@ public class CommandSlotContainerController : MonoBehaviour
             if (child.Closed()) return powerConsumed;
             else if (child.Opened() && child.deletable)
             {
-                byte commandId = Command.TYPES.ToList().Find(id => child.arrow.sprite.name.Equals(Command.GetDisplay(id)));
+                Debug.Log(child.arrow.sprite.name);
+                byte commandId = (byte)Command.GetDisplay.ToList().FindIndex(s => child.arrow.sprite.name.StartsWith(s));
+                Debug.Log(commandId);
                 return powerConsumed + Command.power[commandId];
             }
             else if (child.IsNext())
             {
                 child.Open();
                 child.arrow.sprite = s;
-                child.arrow.transform.localRotation = cmd is Command.Spawn ? Quaternion.identity : Quaternion.Euler(Vector3.forward * cmd.direction * 90);
+                child.arrow.transform.localRotation = cmd.commandId == Command.SPAWN_COMMAND_ID ? Quaternion.identity : Quaternion.Euler(Vector3.forward * cmd.direction * 90);
                 child.deletable = true;
                 return powerConsumed + Command.power[cmd.commandId];
             }

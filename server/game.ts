@@ -50,7 +50,6 @@ const MAX_PRIORITY = 8;
 const DEFAULT_BATTERY_MULTIPLIER = 8;
 
 export type Command = {
-  owner: string;
   robotId: number;
   commandId: number;
   direction: number;
@@ -140,7 +139,7 @@ export const storeCommands = (
 ): void => {
   g.history[g.turn] = {
     ...(g.history[g.turn] || {}),
-    [p.name]: commands.map((c) => ({ ...c, owner: p.name })),
+    [p.name]: (commands || []).map((c) => ({ ...c, owner: p.name })),
   };
 };
 
@@ -289,7 +288,7 @@ export const commandsToEvents = (game: LiveGame): GameEvent[] => {
     });
     currentCmds.forEach((c) => {
       const primaryRobot = getRobot[c.robotId];
-      const isPrimary = c.owner === primary.name;
+      const isPrimary = primary.team.includes(primaryRobot);
       if (c.commandId === SPAWN_COMMAND_ID) {
         priorityEvents.push(
           ...spawn(

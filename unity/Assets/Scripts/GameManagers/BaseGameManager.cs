@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.Events;
 using System;
 using System.Collections.Generic;
@@ -20,6 +19,7 @@ public class BaseGameManager
     private List<HistoryState> history = new List<HistoryState>();
     private Map board;
     private List<RobotStats> roster;
+    private Action SetupNextTurn;
 
     private static BaseGameManager instance;
 
@@ -195,26 +195,24 @@ public class BaseGameManager
         else PlayEvent(events, index + 1);
     }
 
-    private void PlayEvents(GameEvent[] events)
+    private void PlayEvents(GameEvent[] events, byte turn)
     {
         uiController.LightUpPanel(true, false);
         PlayEvent(events, 0);
-    }
+        SetupNextTurn = () => {
+            robotControllers.Values.ToList().ForEach(SetupRobotTurn);
 
-    private void SetupNextTurn()
-    {
-        robotControllers.Values.ToList().ForEach(SetupRobotTurn);
+            uiController.submitCommands.Deactivate();
+            uiController.backToPresent.Deactivate();
+            uiController.stepForwardButton.Deactivate();
+            uiController.stepBackButton.SetActive(history.Count != 0);
+            uiController.robotButtonContainer.SetButtons(true);
+            uiController.LightUpPanel(false, false);
 
-        uiController.submitCommands.Deactivate();
-        uiController.backToPresent.Deactivate();
-        uiController.stepForwardButton.Deactivate();
-        uiController.stepBackButton.SetActive(history.Count != 0);
-        uiController.robotButtonContainer.SetButtons(true);
-        uiController.LightUpPanel(false, false);
-
-        currentHistoryIndex = history.Count;
-        turnNumber += 1;
-        history.Add(SerializeState((byte)(turnNumber), GameConstants.MAX_PRIORITY));
+            currentHistoryIndex = history.Count;
+            turnNumber += turn;
+            history.Add(SerializeState((byte)(turnNumber), GameConstants.MAX_PRIORITY));
+        };
     }
 
     private void SetupRobotTurn(RobotController r)

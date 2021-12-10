@@ -69,7 +69,6 @@ public class Command
     public const byte ATTACK_COMMAND_ID = 2;
     public const byte SPECIAL_COMMAND_ID = 3;
     public short robotId;
-    public string owner;
     public string display;
     public byte direction;
     public byte commandId;
@@ -77,7 +76,7 @@ public class Command
     {
         direction = dir;
         commandId = id;
-        display = GetDisplay(commandId);
+        display = GetDisplay[commandId];
     }
     public static byte[] limit = new byte[]
     {
@@ -102,42 +101,9 @@ public class Command
     };
     public static string[] byteToDirectionString = new string[]{"Up", "Left", "Down", "Right"};
 
-    public static string GetDisplay(byte commandId)
-    {
-        switch (commandId)
-        {
-            case SPAWN_COMMAND_ID:
-                return typeof(Spawn).Name;
-            case MOVE_COMMAND_ID:
-                return typeof(Move).Name;
-            case ATTACK_COMMAND_ID:
-                return typeof(Attack).Name;
-            case SPECIAL_COMMAND_ID:
-                return typeof(Special).Name;
-            default:
-                return typeof(Command).Name;
-        }
-    }
-
-    public class Spawn : Command
-    {
-        public Spawn(byte dir) : base(dir, SPAWN_COMMAND_ID) { }
-    }
-
-    public class Move : Command
-    {
-        public Move(byte dir) : base(dir, MOVE_COMMAND_ID) { }
-    }
-
-    public class Attack : Command
-    {
-        public Attack(byte dir) : base(dir, ATTACK_COMMAND_ID) { }
-    }
-
-    public class Special : Command
-    {
-        public Special(byte dir) : base(dir, SPECIAL_COMMAND_ID) { }
-    }
+    public static string[] GetDisplay = new string[] {
+        "Spawn","Move","Attack","Special"
+    };
 }
 
 public class GameEvent {
@@ -293,6 +259,13 @@ public class GameReadyMessage: SocketMessage
 public class SubmitCommandsMessage: SocketMessage
 {
     public List<Command> commands;
+}
+
+[Serializable]
+public class ServerErrorMessage: SocketMessage
+{
+    public string serverMessage;
+    public string exceptionMessage;
 }
     
 [Serializable]

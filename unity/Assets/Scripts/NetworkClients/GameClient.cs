@@ -12,7 +12,7 @@ public class GameClient
     private WebSocket ws;
     protected Action<List<RobotStats>> OnSetupCallback;
     protected UnityAction<GameReadyMessage> OnGameReady;
-    protected UnityAction<GameEvent[]> onTurnCallback;
+    protected UnityAction<GameEvent[], byte> onTurnCallback;
 
     public GameClient(string psid, string ipAddress, int p, Action<List<RobotStats>> callback, UnityAction<string> reject)
     {
@@ -32,6 +32,14 @@ public class GameClient
                         break;
                     case "GAME_READY":
                         OnGameReady(JsonUtility.FromJson<GameReadyMessage>(e.Data));
+                        break;
+                    case "TURN_EVENTS":
+                        OnTurnEvents(JsonUtility.FromJson<TurnEventsMessage>(e.Data));
+                        break;
+                    case "SERVER_ERROR":
+                        ServerErrorMessage err = JsonUtility.FromJson<ServerErrorMessage>(e.Data);
+                        Debug.LogError(err.exceptionMessage);
+                        reject(err.serverMessage);
                         break;
                     default:
                         OnUnsupportedMessage(e.Data);
@@ -99,25 +107,18 @@ public class GameClient
         Debug.LogError(e.Exception);
     }
 
-    protected void OnTurnEvents()//NetworkMessage netMsg)
+    protected void OnTurnEvents(TurnEventsMessage msg)
     {
         Debug.Log("Received Turn Events");
-       // Messages.TurnEventsMessage msg = netMsg.ReadMessage<Messages.TurnEventsMessage>();
-       // onTurnCallback(msg.events);
+        onTurnCallback(msg.events, msg.turn);
     }
 
     protected void OnOpponentWaiting()//NetworkMessage netMsg)
     {
         //BaseGameManager.uiController.LightUpPanel(!GameConstants.LOCAL_MODE, false);
     }
-
-    protected void OnServerError()//NetworkMessage netMsg)
-    {
-       // Messages.ServerErrorMessage msg = netMsg.ReadMessage<Messages.ServerErrorMessage>();
-       // Debug.LogError(msg.serverMessage + ": " + msg.exceptionType + " - " + msg.exceptionMessage);
-    }
     
-    internal void SendSubmitCommands (List<Command> commands, string owner, UnityAction<GameEvent[]> callback) {
+    internal void SendSubmitCommands (List<Command> commands, string owner, UnityAction<GameEvent[], byte> callback) {
         SubmitCommandsMessage msg = new SubmitCommandsMessage();
         msg.commands = commands;
         msg.name = "SUBMIT_COMMANDS";

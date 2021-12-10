@@ -57,14 +57,14 @@ public class UIController : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            commandButtonContainer.GetByName(Command.GetDisplay(Command.SPAWN_COMMAND_ID)).Click();
+            commandButtonContainer.GetByName(Command.GetDisplay[Command.SPAWN_COMMAND_ID]).Click();
         } else if (Input.GetKeyDown(KeyCode.M))
         {
-            commandButtonContainer.GetByName(Command.GetDisplay(Command.MOVE_COMMAND_ID)).Click();
+            commandButtonContainer.GetByName(Command.GetDisplay[Command.MOVE_COMMAND_ID]).Click();
         }
         else if (Input.GetKeyDown(KeyCode.A))
         {
-            commandButtonContainer.GetByName(Command.GetDisplay(Command.ATTACK_COMMAND_ID)).Click();
+            commandButtonContainer.GetByName(Command.GetDisplay[Command.ATTACK_COMMAND_ID]).Click();
         }
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
@@ -166,7 +166,7 @@ public class UIController : MonoBehaviour
 
     private void EachDirectionButton(MenuItemController directionButton, MenuItemController robotButton, RobotController robotController, string commandName)
     {
-        bool isSpawn = commandName.Equals(Command.GetDisplay(Command.SPAWN_COMMAND_ID));
+        bool isSpawn = commandName.Equals(Command.GetDisplay[Command.SPAWN_COMMAND_ID]);
         byte dir = (byte) Command.byteToDirectionString.ToList().IndexOf(directionButton.name);
         directionButton.SetSprite(isSpawn ? queueSprites[dir] : GetArrow(commandName));
         directionButton.SetCallback(() => DirectionButtonCallback(robotButton, robotController, commandName, dir));
@@ -184,7 +184,7 @@ public class UIController : MonoBehaviour
     private void CommandSlotClickCallback(RobotController r, int index)
     {
         ClearCommands(r.id, r.isOpponent);
-        if (r.commands[index] is Command.Spawn)
+        if (r.commands[index].commandId == Command.SPAWN_COMMAND_ID)
         {
             r.commands.Clear();
         }
@@ -220,7 +220,7 @@ public class UIController : MonoBehaviour
 
     public void AddSubmittedCommand(Command cmd, short id, bool isOpponent)
     {
-        Sprite s = cmd is Command.Spawn ? queueSprites[cmd.direction] : GetArrow(Command.GetDisplay(cmd.commandId));
+        Sprite s = cmd.commandId == Command.SPAWN_COMMAND_ID ? queueSprites[cmd.direction] : GetArrow(Command.GetDisplay[cmd.commandId]);
         RobotPanelsContainerController robotPanelsContainer = isOpponent ? opponentsRobots : myRobots;
         robotPanelsContainer.AddSubmittedCommand(cmd, id, s);
         submitCommands.Activate();
