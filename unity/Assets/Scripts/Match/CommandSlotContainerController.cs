@@ -18,6 +18,7 @@ public class CommandSlotContainerController : MonoBehaviour
 
     private CommandSlotController InitializeCommand(int c, short robotId, byte robotPriority)
     {
+        Debug.Log("Initialized " + robotId + " | " + robotPriority);
         CommandSlotController cmd = Instantiate(commandSlot, transform);
         cmd.Initialize(robotId, c + 1, robotPriority);
         cmd.transform.localScale = new Vector3(1, 1.0f / GameConstants.MAX_PRIORITY, 1);

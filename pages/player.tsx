@@ -191,8 +191,8 @@ const MatchScene = ({
                     if (e.key === "Enter") {
                       commands.current.push({
                         robotId: r.id,
-                        commandId: Number(command[0]),
-                        direction: Number(command[1]),
+                        commandId: Number(command[r.id][0]),
+                        direction: Number(command[r.id][1]),
                       });
                       setCommand({ ...command, [r.id]: "" });
                     }

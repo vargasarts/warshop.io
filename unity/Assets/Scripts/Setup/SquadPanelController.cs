@@ -11,9 +11,9 @@ public class SquadPanelController : MonoBehaviour
 
     private List<RobotSquadImageController> squadRobots = new List<RobotSquadImageController>();
 
-    public void SetAddCallback(UnityAction<SquadPanelController> callback)
+    public void SetAddCallback(UnityAction callback)
     {
-        squadPanelButton.onClick.AddListener(() => callback(this));
+        squadPanelButton.onClick.AddListener(callback);
     }
 
     public RobotSquadImageController AddRobotSquadImage()

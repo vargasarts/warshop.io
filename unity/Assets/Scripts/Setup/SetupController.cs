@@ -24,7 +24,7 @@ public class SetupController : MonoBehaviour
     {
         List<RobotStats> roster = BaseGameManager.InitializeSetup(this);
         
-        mySquadPanel.SetAddCallback(AddSelectedToMySquad);
+        mySquadPanel.SetAddCallback(() => AddSelectedToSquad());
         startGameButton.onClick.AddListener(StartGame);
         robotRosterPanel.SetMaximizeCallback(maximizeSelection);
         Dictionary<string,Sprite> spritesByName = robotDir.ToDictionary((s) => s.name);
@@ -37,6 +37,15 @@ public class SetupController : MonoBehaviour
             loadMatch = false;
             SceneManager.LoadScene(matchScene);
         }
+#if UNITY_EDITOR
+        if (Input.GetKeyDown(KeyCode.KeypadEnter))
+        {
+            StartGameImpl(robotRosterPanel.GetComponents<RobotRosterPanelController>()
+               .ToList()
+               .GetRange(0, GameConstants.MAX_ROBOTS_ON_SQUAD)
+               .ConvertAll(r => r.GetUuid()));
+        }
+#endif
     }
 
     public void EnterLobby()
@@ -55,39 +64,33 @@ public class SetupController : MonoBehaviour
         mySquadPanel.squadPanelButton.interactable= true;
     }
 
-    public void AddSelectedToMySquad(SquadPanelController squadPanel)
+    public void AddSelectedToSquad()
     {
-        AddSelectedToSquad(squadPanel, RemoveAddedFromMySquad);
-        UpdateStarText();
-    }
-
-    public void AddSelectedToSquad(SquadPanelController squadPanel, UnityAction<RobotSquadImageController> removeCallback)
-    {
-        RobotSquadImageController addedRobot = squadPanel.AddRobotSquadImage();
-        addedRobot.SetRemoveCallback(removeCallback);
+        RobotSquadImageController addedRobot = mySquadPanel.AddRobotSquadImage();
+        addedRobot.SetRemoveCallback(RemoveAddedFromSquad);
         addedRobot.SetSprite(maximizedRosterRobot.GetRobotSprite(), maximizedRosterRobot.GetUuid());
 
         maximizedRosterRobot.Hide();
         mySquadPanel.squadPanelButton.interactable =(false);
-    }
-
-    public void RemoveAddedFromMySquad(RobotSquadImageController robot)
-    {
-        RemoveAddedFromSquad(robot, mySquadPanel);
         UpdateStarText();
     }
 
-    public void RemoveAddedFromSquad(RobotSquadImageController robot, SquadPanelController panel)
+    public void RemoveAddedFromSquad(RobotSquadImageController robot)
     {
         Destroy(robot.gameObject);
-        panel.RemoveRobotSquadImage(robot);
+        mySquadPanel.RemoveRobotSquadImage(robot);
+        UpdateStarText();
     }
 
     void StartGame()
     {
+        StartGameImpl(mySquadPanel.GetSquadRobotUuids());
+    }
+
+    void StartGameImpl(List<string> myRoster)
+    {
         statusModal.ShowLoading();
-        List<string> myRosterStrings = mySquadPanel.GetSquadRobotUuids();
-        BaseGameManager.SendPlayerInfo(myRosterStrings, ProfileController.username, () => {loadMatch = true;});
+        BaseGameManager.SendPlayerInfo(myRoster, ProfileController.username, () => {loadMatch = true;});
     }
 
     void UpdateStarText()
