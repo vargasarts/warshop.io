@@ -90,11 +90,11 @@ public class UIController : MonoBehaviour
         SceneManager.LoadScene("Setup");
     }
 
-    public void InitializeUI(Game.Player myPlayer, Game.Player opponentPlayer)
+    public void InitializeUI(string myName, List<Robot> myTeam, string opponentName, List<Robot> opponentTeam)
     {
         Debug.Log("Initialize UI");
-        SetOpponentPlayerPanel(opponentPlayer);
-        SetMyPlayerPanel(myPlayer);
+        SetOpponentPlayerPanel(opponentName, opponentTeam);
+        SetMyPlayerPanel(myName, myTeam);
 
         submitCommands.Deactivate();
         backToPresent.Deactivate();
@@ -106,22 +106,22 @@ public class UIController : MonoBehaviour
         directionButtonContainer.SetButtons(false);
     }
 
-    private void SetOpponentPlayerPanel(Game.Player player)
+    private void SetOpponentPlayerPanel(string name, List<Robot> team)
     {
-        opponentsPlayerName.text = player.name;
-        SetPlayerPanel(player, opponentsRobots, "OpponentPanel");
+        opponentsPlayerName.text = name;
+        SetPlayerPanel(team, opponentsRobots, "OpponentPanel");
     }
 
-    private void SetMyPlayerPanel(Game.Player player)
+    private void SetMyPlayerPanel(string name, List<Robot> team)
     {
-        myPlayerName.text = player.name;
-        SetPlayerPanel(player, myRobots, "MyPanel");
+        myPlayerName.text = name;
+        SetPlayerPanel(team, myRobots, "MyPanel");
     }
 
-    void SetPlayerPanel(Game.Player player, RobotPanelsContainerController container, string layer)
+    void SetPlayerPanel(List<Robot> team, RobotPanelsContainerController container, string layer)
     {
-        container.Initialize(player.team.Count);
-        player.team.ForEach(container.AddPanel);
+        container.Initialize(team.Count);
+        team.ForEach(container.AddPanel);
         ChangeLayer(container.gameObject, layer);
     }
 
@@ -231,13 +231,13 @@ public class UIController : MonoBehaviour
         myRobots.DestroyCommandMenu();
     }
 
-    public void LightUpPanel(bool bright, bool isUser)
+    public void LightUpPanel(bool isUser)
     {
-        //Image panel = (isUser ? UserBackground : OpponentBackground);
-        //Color regular = (isUser ? new Color(0, 0.5f, 1.0f, 1.0f) : new Color(1.0f, 0, 0, 1.0f));
-        //float mult = (bright ? 1.0f : 0.5f);
-        //panel.color = new Color(regular.r * mult, regular.g*mult, regular.b * mult, regular.a * mult);
-        //TODO - Need another indicator of opponent ready here
+        Debug.Log("lighting up " + isUser);
+        // Image panel = (isUser ? UserBackground : OpponentBackground);
+        // Color regular = (isUser ? new Color(0, 0.5f, 1.0f, 1.0f) : new Color(1.0f, 0, 0, 1.0f));
+        // float mult = (bright ? 1.0f : 0.5f);
+        // panel.color = new Color(regular.r * mult, regular.g*mult, regular.b * mult, regular.a * mult);
     }
 
     public Sprite GetArrow(string eventName)

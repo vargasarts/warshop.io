@@ -1,110 +1,5 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-
-public class Game
-{
-    public class Player
-    {
-        public List<Robot> team;
-        public string name {get;internal set;}
-        public short battery = GameConstants.POINTS_TO_WIN;
-        public Player(List<Robot> t, string n)
-        {
-            team = t;
-            name = n;
-        }
-    }
-}
-
-public class GameConstants
-{
-    public const int POINTS_TO_WIN = 256;
-    public const byte MAX_ROBOTS_ON_SQUAD = 4;
-    public const byte MAX_PRIORITY = 8;
-    public const byte DEFAULT_SPAWN_LIMIT = 1;
-    public const byte DEFAULT_MOVE_LIMIT = 2;
-    public const byte DEFAULT_ATTACK_LIMIT = 1;
-    public const byte DEFAULT_SPECIAL_LIMIT = 0;
-    public const byte DEFAULT_SPAWN_POWER = 2;
-    public const byte DEFAULT_MOVE_POWER = 1;
-    public const byte DEFAULT_ATTACK_POWER = 2;
-    public const byte DEFAULT_SPECIAL_POWER = 2;
-}
-
-[Serializable]
-public class RobotStats
-{
-    public string name;
-    public byte priority;
-    public short health;
-    public short attack;
-    public string uuid;
-}
-
-[Serializable]
-public class Robot : RobotStats
-{
-    public string description;
-    public short startingHealth;
-    public short id;
-    internal Robot(string _name)
-    {
-        name = _name;
-    }
-    public static Robot create(string robotName)
-    {
-        return new Robot(robotName);
-    }
-}
-
-public class Command
-{
-    public const byte UP = 0;
-    public const byte LEFT = 1;
-    public const byte DOWN = 2;
-    public const byte RIGHT = 3;
-    public const byte SPAWN_COMMAND_ID = 0;
-    public const byte MOVE_COMMAND_ID = 1;
-    public const byte ATTACK_COMMAND_ID = 2;
-    public const byte SPECIAL_COMMAND_ID = 3;
-    public short robotId;
-    public string display;
-    public byte direction;
-    public byte commandId;
-    public Command(byte dir, byte id)
-    {
-        direction = dir;
-        commandId = id;
-        display = GetDisplay[commandId];
-    }
-    public static byte[] limit = new byte[]
-    {
-        GameConstants.DEFAULT_SPAWN_LIMIT,
-        GameConstants.DEFAULT_MOVE_LIMIT,
-        GameConstants.DEFAULT_ATTACK_LIMIT,
-        GameConstants.DEFAULT_SPECIAL_LIMIT
-    };
-    public static byte[] power = new byte[]
-    {
-        GameConstants.DEFAULT_SPAWN_POWER,
-        GameConstants.DEFAULT_MOVE_POWER,
-        GameConstants.DEFAULT_ATTACK_POWER,
-        GameConstants.DEFAULT_SPECIAL_POWER
-    };
-
-    public static byte[] TYPES = new byte[] {
-        SPAWN_COMMAND_ID,
-        MOVE_COMMAND_ID,
-        ATTACK_COMMAND_ID,
-        SPECIAL_COMMAND_ID
-    };
-    public static string[] byteToDirectionString = new string[]{"Up", "Left", "Down", "Right"};
-
-    public static string[] GetDisplay = new string[] {
-        "Spawn","Move","Attack","Special"
-    };
-}
 
 public class GameEvent {
     public byte priority;
@@ -192,6 +87,94 @@ public class DeathEvent: GameEvent
 }
 
 // EVERYTHING ABOVE IS DEPRECATED
+public class GameConstants
+{
+    public const int POINTS_TO_WIN = 256;
+    public const byte MAX_ROBOTS_ON_SQUAD = 4;
+    public const byte MAX_PRIORITY = 8;
+    public const byte DEFAULT_SPAWN_LIMIT = 1;
+    public const byte DEFAULT_MOVE_LIMIT = 2;
+    public const byte DEFAULT_ATTACK_LIMIT = 1;
+    public const byte DEFAULT_SPECIAL_LIMIT = 0;
+    public const byte DEFAULT_SPAWN_POWER = 2;
+    public const byte DEFAULT_MOVE_POWER = 1;
+    public const byte DEFAULT_ATTACK_POWER = 2;
+    public const byte DEFAULT_SPECIAL_POWER = 2;
+}
+
+[Serializable]
+public class RobotStats
+{
+    public string name;
+    public byte priority;
+    public short health;
+    public short attack;
+    public string uuid;
+}
+
+[Serializable]
+public class Robot : RobotStats
+{
+    public string description;
+    public short startingHealth;
+    public short id;
+    internal Robot(string _name)
+    {
+        name = _name;
+    }
+    public static Robot create(string robotName)
+    {
+        return new Robot(robotName);
+    }
+}
+
+[Serializable]
+public class Command
+{
+    public const byte UP = 0;
+    public const byte LEFT = 1;
+    public const byte DOWN = 2;
+    public const byte RIGHT = 3;
+    public const byte SPAWN_COMMAND_ID = 0;
+    public const byte MOVE_COMMAND_ID = 1;
+    public const byte ATTACK_COMMAND_ID = 2;
+    public const byte SPECIAL_COMMAND_ID = 3;
+    public short robotId;
+    public byte direction;
+    public byte commandId;
+    public Command(byte dir, byte id)
+    {
+        direction = dir;
+        commandId = id;
+    }
+    public static byte[] limit = new byte[]
+    {
+        GameConstants.DEFAULT_SPAWN_LIMIT,
+        GameConstants.DEFAULT_MOVE_LIMIT,
+        GameConstants.DEFAULT_ATTACK_LIMIT,
+        GameConstants.DEFAULT_SPECIAL_LIMIT
+    };
+    public static byte[] power = new byte[]
+    {
+        GameConstants.DEFAULT_SPAWN_POWER,
+        GameConstants.DEFAULT_MOVE_POWER,
+        GameConstants.DEFAULT_ATTACK_POWER,
+        GameConstants.DEFAULT_SPECIAL_POWER
+    };
+
+    public static byte[] TYPES = new byte[] {
+        SPAWN_COMMAND_ID,
+        MOVE_COMMAND_ID,
+        ATTACK_COMMAND_ID,
+        SPECIAL_COMMAND_ID
+    };
+    public static string[] byteToDirectionString = new string[]{"Up", "Left", "Down", "Right"};
+
+    public static string[] GetDisplay = new string[] {
+        "Spawn","Move","Attack","Special"
+    };
+}
+
 [Serializable]
 public class Space {
     public int x;

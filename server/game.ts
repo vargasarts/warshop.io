@@ -141,6 +141,7 @@ export const storeCommands = (
     ...(g.history[g.turn] || {}),
     [p.name]: (commands || []).map((c) => ({ ...c, owner: p.name })),
   };
+  p.ready = true;
 };
 
 const UP = 0;
@@ -527,5 +528,7 @@ export const commandsToEvents = (game: LiveGame): GameEvent[] => {
     }
   }
 
+  game.primary.ready = false;
+  game.secondary.ready = false;
   return events;
 };

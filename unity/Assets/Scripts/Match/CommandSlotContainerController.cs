@@ -18,7 +18,6 @@ public class CommandSlotContainerController : MonoBehaviour
 
     private CommandSlotController InitializeCommand(int c, short robotId, byte robotPriority)
     {
-        Debug.Log("Initialized " + robotId + " | " + robotPriority);
         CommandSlotController cmd = Instantiate(commandSlot, transform);
         cmd.Initialize(robotId, c + 1, robotPriority);
         cmd.transform.localScale = new Vector3(1, 1.0f / GameConstants.MAX_PRIORITY, 1);
@@ -69,9 +68,7 @@ public class CommandSlotContainerController : MonoBehaviour
             if (child.Closed()) return powerConsumed;
             else if (child.Opened() && child.deletable)
             {
-                Debug.Log(child.arrow.sprite.name);
                 byte commandId = (byte)Command.GetDisplay.ToList().FindIndex(s => child.arrow.sprite.name.StartsWith(s));
-                Debug.Log(commandId);
                 return powerConsumed + Command.power[commandId];
             }
             else if (child.IsNext())

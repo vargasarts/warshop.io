@@ -167,8 +167,15 @@ const onSubmitCommands = (
         : game.secondary?.ws === ws
         ? game.secondary
         : null;
-    if (p) storeCommands(game, p, commands);
-    if (game.primary?.ready && game.secondary?.ready) {
+    if (!p) {
+      console.warn("Received submit commands from unknown player");
+      return;
+    }
+    if (!game.primary || !game.secondary) {
+      throw new Error("Lost reference to a player");
+    }
+    storeCommands(game, p, commands);
+    if (game.primary.ready && game.secondary.ready) {
       const events = commandsToEvents(game as Required<Game>);
       game.primary.ws.send(
         JSON.stringify({
@@ -184,8 +191,11 @@ const onSubmitCommands = (
           turn: game.turn,
         })
       );
+      console.log("events sent: ", JSON.stringify(events, null, 4));
     } else {
-      ws.send(JSON.stringify({ name: "WAITING_COMMANDS" }));
+      const otherWs =
+        game.primary.ws === ws ? game.secondary.ws : game.primary.ws;
+      otherWs.send(JSON.stringify({ name: "WAITING_COMMANDS" }));
     }
   } catch (err) {
     const e = err as Error;

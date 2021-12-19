@@ -11,22 +11,22 @@ const PlatinumGrunt: IdLessRobotStats = {
 };
 
 const GoldenGrunt: IdLessRobotStats = {
-  priority: 8,
-  health: 7,
+  priority: 7,
+  health: 8,
   attack: 3,
   name: "Golden Grunt",
 };
 
 const SilverGrunt: IdLessRobotStats = {
-  priority: 8,
-  health: 6,
+  priority: 6,
+  health: 8,
   attack: 3,
   name: "Silver Grunt",
 };
 
 const BronzeGrunt: IdLessRobotStats = {
-  priority: 8,
-  health: 5,
+  priority: 5,
+  health: 8,
   attack: 3,
   name: "Bronze Grunt",
 };

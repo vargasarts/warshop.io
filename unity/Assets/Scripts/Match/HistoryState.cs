@@ -76,7 +76,7 @@ public class HistoryState
     private RobotState.Cmd SerializeCmd(Command cmd)
     {
         RobotState.Cmd c = new RobotState.Cmd();
-        c.name = cmd.display;
+        c.name = Command.GetDisplay[cmd.commandId];
         c.dir = cmd.direction;
         return c;
     }

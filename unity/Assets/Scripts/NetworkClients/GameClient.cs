@@ -36,6 +36,9 @@ public class GameClient
                     case "TURN_EVENTS":
                         OnTurnEvents(JsonUtility.FromJson<TurnEventsMessage>(e.Data));
                         break;
+                    case "WAITING_COMMANDS":
+                        OnOpponentWaiting();
+                        break;
                     case "SERVER_ERROR":
                         ServerErrorMessage err = JsonUtility.FromJson<ServerErrorMessage>(e.Data);
                         Debug.LogError(err.exceptionMessage);
@@ -113,12 +116,13 @@ public class GameClient
         onTurnCallback(msg.events, msg.turn);
     }
 
-    protected void OnOpponentWaiting()//NetworkMessage netMsg)
+    protected void OnOpponentWaiting()
     {
-        //BaseGameManager.uiController.LightUpPanel(!GameConstants.LOCAL_MODE, false);
+        BaseGameManager.getUi().LightUpPanel(false);
     }
     
     internal void SendSubmitCommands (List<Command> commands, string owner, UnityAction<GameEvent[], byte> callback) {
+        Debug.Log(commands.Count);
         SubmitCommandsMessage msg = new SubmitCommandsMessage();
         msg.commands = commands;
         msg.name = "SUBMIT_COMMANDS";

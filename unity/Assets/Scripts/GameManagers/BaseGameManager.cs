@@ -8,8 +8,10 @@ public class BaseGameManager
 {
     private BoardController boardController;
     private SetupController setupController;
-    private Game.Player myPlayer;
-    private Game.Player opponentPlayer;
+    private string myName;
+    private string opponentName;
+    private List<Robot> myTeam;
+    private List<Robot> opponentTeam;
     private GameClient gameClient;
     private UIController uiController;
     private Dictionary<short, RobotController> robotControllers;
@@ -45,14 +47,15 @@ public class BaseGameManager
 
     public static void SendPlayerInfo(List<string> myRobotNames, string username, Action callback)
     {
-        instance.myPlayer = new Game.Player(new List<Robot>(), username);
-        instance.gameClient.SendGameRequest(myRobotNames, instance.myPlayer.name, instance.LoadBoard, callback);
+        instance.myName = username;
+        instance.gameClient.SendGameRequest(myRobotNames, username, instance.LoadBoard, callback);
     }
 
-    internal void LoadBoard(List<Robot> myTeam, List<Robot> opponentTeam, string opponentName, Map b)
+    internal void LoadBoard(List<Robot> _myTeam, List<Robot> _opponentTeam, string _opponentName, Map b)
     {
-        myPlayer.team = myTeam;
-        opponentPlayer = new Game.Player(opponentTeam, opponentName);
+        myTeam = _myTeam;
+        opponentName = _opponentName;
+        opponentTeam = _opponentTeam;
         board = b;
     }
 
@@ -60,20 +63,20 @@ public class BaseGameManager
     {
         instance.boardController = bc;
         instance.boardController.InitializeBoard(instance.board);
-        instance.boardController.SetBattery(instance.myPlayer.battery, instance.opponentPlayer.battery);
+        instance.boardController.SetBattery(GameConstants.POINTS_TO_WIN, GameConstants.POINTS_TO_WIN);
         instance.InitializeRobots();
     }
 
     private void InitializeRobots()
     {
-        robotControllers = new Dictionary<short, RobotController>(myPlayer.team.Count() + opponentPlayer.team.Count());
-        InitializePlayerRobots(myPlayer, boardController.myDock);
-        InitializePlayerRobots(opponentPlayer, boardController.opponentDock);
+        robotControllers = new Dictionary<short, RobotController>(myTeam.Count() + opponentTeam.Count());
+        InitializePlayerRobots(myTeam, boardController.myDock);
+        InitializePlayerRobots(opponentTeam, boardController.opponentDock);
     }
 
-    private void InitializePlayerRobots(Game.Player player, DockController dock)
+    private void InitializePlayerRobots(List<Robot> team, DockController dock)
     {
-        player.team.ForEach(r => InitializeRobot(r, dock));
+        team.ForEach(r => InitializeRobot(r, dock));
     }
 
     private void InitializeRobot(Robot robot, DockController dock)
@@ -88,7 +91,7 @@ public class BaseGameManager
     public static void InitializeUI(UIController ui)
     {
         instance.uiController = ui;
-        instance.uiController.InitializeUI(instance.myPlayer, instance.opponentPlayer);
+        instance.uiController.InitializeUI(instance.myName, instance.myTeam, instance.opponentName, instance.opponentTeam);
         instance.robotControllers.Keys.ToList().ForEach(k => instance.uiController.BindUiToRobotController(k, instance.robotControllers[k]));
         instance.uiController.submitCommands.SetCallback(instance.SubmitCommands);
         instance.uiController.backToPresent.SetCallback(instance.BackToPresent);
@@ -97,17 +100,21 @@ public class BaseGameManager
         instance.history.Add(instance.SerializeState(1, GameConstants.MAX_PRIORITY));
     }
 
+    public static UIController getUi() {
+        return instance.uiController;
+    }
+
     private void SubmitCommands()
     {
         List<Command> commands = GetSubmittedCommands(robotControllers.Values.ToList());
         uiController.actionButtonContainer.SetButtons(false);
         uiController.robotButtonContainer.SetButtons(false);
-        gameClient.SendSubmitCommands(commands, myPlayer.name, PlayEvents);
+        gameClient.SendSubmitCommands(commands, myName, PlayEvents);
     }
 
     private List<Command> GetSubmittedCommands(List<RobotController> robotsToSubmit)
     {
-        uiController.LightUpPanel(true, true);
+        uiController.LightUpPanel(true);
         List<Command> commands = robotsToSubmit.ConvertAll(AddCommands).SelectMany(x => x).ToList();
         uiController.commandButtonContainer.SetButtons(false);
         uiController.directionButtonContainer.SetButtons(false);
@@ -197,7 +204,7 @@ public class BaseGameManager
 
     private void PlayEvents(GameEvent[] events, byte turn)
     {
-        uiController.LightUpPanel(true, false);
+        uiController.LightUpPanel(false);
         PlayEvent(events, 0);
         SetupNextTurn = () => {
             robotControllers.Values.ToList().ForEach(SetupRobotTurn);
@@ -207,7 +214,7 @@ public class BaseGameManager
             uiController.stepForwardButton.Deactivate();
             uiController.stepBackButton.SetActive(history.Count != 0);
             uiController.robotButtonContainer.SetButtons(true);
-            uiController.LightUpPanel(false, false);
+            uiController.LightUpPanel(false);
 
             currentHistoryIndex = history.Count;
             turnNumber += turn;
