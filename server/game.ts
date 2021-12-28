@@ -171,7 +171,7 @@ const spawn = (
   isPrimary: boolean,
   priority: number
 ): GameEvent[] => {
-  if (posEquals(r.position, NULL_VEC)) return [];
+  if (!posEquals(r.position, NULL_VEC)) return [];
   const evt = {
     destinationPos: pos,
     robotId: r.id,
@@ -259,23 +259,24 @@ export const commandsToEvents = (game: LiveGame): GameEvent[] => {
           [ATTACK_COMMAND_ID]: 0,
           [SPECIAL_COMMAND_ID]: 0,
         },
-        isActive: false,
+        isActive: true,
       },
     ])
   );
   const events: GameEvent[] = [];
-  for (let p = MAX_PRIORITY; p >= 0; p--) {
+  for (let p = MAX_PRIORITY; p > 0; p--) {
     const currentCmds = new Set<Command>(
       Object.values(robotIdToTurnObject)
         .filter(
           (rto) =>
-            rto.priority == p && commands.some((c) => c.robotId == rto.robotId)
+            rto.priority === p && commands.some((c) => c.robotId == rto.robotId)
         )
         .map((rto) => {
           rto.priority--;
-          const cmd = commands.find((c) => c.robotId == rto.robotId);
-          commands.splice(commands.findIndex((c) => c === cmd));
-          return cmd as Command; // guaranteed bc of filter above
+          const commandIndex = commands.findIndex(
+            (c) => c.robotId === rto.robotId
+          );
+          return commands.splice(commandIndex, 1)[0];
         })
     );
     const priorityEvents: GameEvent[] = [];

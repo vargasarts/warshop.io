@@ -122,7 +122,6 @@ public class GameClient
     }
     
     internal void SendSubmitCommands (List<Command> commands, string owner, UnityAction<GameEvent[], byte> callback) {
-        Debug.Log(commands.Count);
         SubmitCommandsMessage msg = new SubmitCommandsMessage();
         msg.commands = commands;
         msg.name = "SUBMIT_COMMANDS";
