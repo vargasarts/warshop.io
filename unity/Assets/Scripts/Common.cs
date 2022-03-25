@@ -1,92 +1,6 @@
 using System;
 using System.Collections.Generic;
 
-public class GameEvent {
-    public byte priority;
-    public short primaryBatteryCost;
-    public short secondaryBatteryCost;
-    public byte type;
-}
-
-public class ResolveEvent : GameEvent {
-
-    internal const byte EVENT_ID = 12;
-    public ResolveEvent() {
-        type = EVENT_ID;
-    }
-    public List<Tuple<short, Tuple<int, int>>> robotIdToSpawn;
-    public List<Tuple<short, Tuple<int, int>>> robotIdToMove;
-    public List<Tuple<short, short>> robotIdToHealth;
-    public bool myBatteryHit;
-    public bool opponentBatteryHit;
-    public List<Tuple<int, int>> missedAttacks {get;set;}
-    public List<short> robotIdsBlocked;
-    public int GetNumResolutions()
-    {
-        return robotIdToSpawn.Count
-        + robotIdToMove.Count
-        + robotIdToHealth.Count
-        + (myBatteryHit ? 1 : 0)
-        + (opponentBatteryHit ? 1 : 0)
-        + missedAttacks.Count
-        + robotIdsBlocked.Count;
-    }
-}
-
-public class EndEvent : GameEvent {
-    internal const byte EVENT_ID = 13;
-
-    public EndEvent() {
-        type = EVENT_ID;
-    }
-    public bool primaryLost;
-    public bool secondaryLost;
-    public short turnCount;
-}
-
-public class SpawnEvent : GameEvent
-{
-    internal const byte EVENT_ID = 1;
-    public SpawnEvent() {
-        type = EVENT_ID;
-    }
-
-    public short robotId;
-}
-
-public class MoveEvent : GameEvent
-{
-    internal const byte EVENT_ID = 2;
-    public MoveEvent() {
-        type = EVENT_ID;
-    }
-    public Tuple<int, int> sourcePos;
-    public Tuple<int, int> destinationPos;
-    public short robotId;
-}
-
-public class AttackEvent : GameEvent
-{
-    internal const byte EVENT_ID = 3;
-
-    public AttackEvent() {
-        type = EVENT_ID;
-    }
-    public List<Tuple<int, int>> locs;
-    public short robotId;
-}
-
-public class DeathEvent: GameEvent
-{
-    internal const byte EVENT_ID = 9;
-    public DeathEvent() {
-        type = EVENT_ID;
-    }
-    public short robotId;
-    public short returnHealth;
-}
-
-// EVERYTHING ABOVE IS DEPRECATED
 public class GameConstants
 {
     public const int POINTS_TO_WIN = 256;
@@ -197,6 +111,78 @@ public class QueueSpace: Space {
 }
 
 [Serializable]
+public class GameEvent {
+    public byte priority;
+    public short primaryBatteryCost;
+    public short secondaryBatteryCost;
+    public byte type;
+    public string json;
+}
+
+
+[Serializable]
+public class ResolveEvent: GameEvent {
+    internal const byte EVENT_ID = 12;
+    public List<Tuple<short, Tuple<int, int>>> robotIdToSpawn;
+    public List<Tuple<short, Tuple<int, int>>> robotIdToMove;
+    public List<Tuple<short, short>> robotIdToHealth;
+    public bool myBatteryHit;
+    public bool opponentBatteryHit;
+    public List<Tuple<int, int>> missedAttacks;
+    public List<short> robotIdsBlocked;
+    public int GetNumResolutions()
+    {
+        return robotIdToSpawn.Count
+        + robotIdToMove.Count
+        + robotIdToHealth.Count
+        + (myBatteryHit ? 1 : 0)
+        + (opponentBatteryHit ? 1 : 0)
+        + missedAttacks.Count
+        + robotIdsBlocked.Count;
+    }
+}
+
+[Serializable]
+public class EndEvent: GameEvent {
+    internal const byte EVENT_ID = 13;
+    public bool primaryLost;
+    public bool secondaryLost;
+    public short turnCount;
+}
+
+[Serializable]
+public class SpawnEvent: GameEvent
+{
+    internal const byte EVENT_ID = 1;
+    public short robotId;
+}
+
+[Serializable]
+public class MoveEvent: GameEvent
+{
+    internal const byte EVENT_ID = 2;
+    public Tuple<int, int> sourcePos;
+    public Tuple<int, int> destinationPos;
+    public short robotId;
+}
+
+[Serializable]
+public class AttackEvent: GameEvent
+{
+    internal const byte EVENT_ID = 3;
+    public List<Tuple<int, int>> locs;
+    public short robotId;
+}
+
+[Serializable]
+public class DeathEvent: GameEvent
+{
+    internal const byte EVENT_ID = 9;
+    public short robotId;
+    public short returnHealth;
+}
+
+[Serializable]
 public class Map 
 {
     public int width;
@@ -281,6 +267,6 @@ public class JoinGameResponse : GameSessionResponse { }
 [Serializable]
 public class TurnEventsMessage
 {
-    public GameEvent[] events;
+    public List<string> events;
     public byte turn;
 }

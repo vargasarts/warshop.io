@@ -130,9 +130,9 @@ public class BaseGameManager
         return robot.commands;
     }
 
-    private void PlayEvent(GameEvent[] events, int index) 
+    private void PlayEvent(List<GameEvent> events, int index) 
     {
-        if (index == events.Length) {
+        if (index == events.Count) {
             SetupNextTurn();
             return;
         }
@@ -202,9 +202,9 @@ public class BaseGameManager
         else PlayEvent(events, index + 1);
     }
 
-    private void PlayEvents(GameEvent[] events, byte turn)
+    private void PlayEvents(List<GameEvent> events, byte turn)
     {
-        uiController.LightUpPanel(false);
+        uiController.DimPanel(false);
         PlayEvent(events, 0);
         SetupNextTurn = () => {
             robotControllers.Values.ToList().ForEach(SetupRobotTurn);
@@ -215,6 +215,8 @@ public class BaseGameManager
             uiController.stepBackButton.SetActive(history.Count != 0);
             uiController.robotButtonContainer.SetButtons(true);
             uiController.LightUpPanel(false);
+            uiController.LightUpPanel(true);
+            uiController.opponentSubmitted = false;
 
             currentHistoryIndex = history.Count;
             turnNumber += turn;

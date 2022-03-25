@@ -11,6 +11,7 @@ public class UIController : MonoBehaviour
 	public Image opponentBackground;
     public RobotPanelsContainerController opponentsRobots;
     public TextMeshPro opponentsPlayerName;
+    public bool opponentSubmitted = false;
     public Image myBackground;
     public RobotPanelsContainerController myRobots;
     public TextMeshPro myPlayerName;
@@ -82,6 +83,10 @@ public class UIController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Return))
         {
             submitCommands.Click();
+        }
+        if (opponentSubmitted) {
+            DimPanel(false);
+            opponentSubmitted = false;
         }
     }
 
@@ -233,11 +238,14 @@ public class UIController : MonoBehaviour
 
     public void LightUpPanel(bool isUser)
     {
-        Debug.Log("lighting up " + isUser);
-        // Image panel = (isUser ? UserBackground : OpponentBackground);
-        // Color regular = (isUser ? new Color(0, 0.5f, 1.0f, 1.0f) : new Color(1.0f, 0, 0, 1.0f));
-        // float mult = (bright ? 1.0f : 0.5f);
-        // panel.color = new Color(regular.r * mult, regular.g*mult, regular.b * mult, regular.a * mult);
+        Image panel = (isUser ? myBackground : opponentBackground);
+        panel.color = (isUser ? new Color(0, 0.5f, 1.0f, 1.0f) : new Color(1.0f, 0, 0, 1.0f));
+    }
+
+    public void DimPanel(bool isUser)
+    {
+        Image panel = (isUser ? myBackground : opponentBackground);
+        panel.color = (isUser ? new Color(0, 0.5f, 1.0f, 0.5f) : new Color(1.0f, 0, 0, 0.5f));
     }
 
     public Sprite GetArrow(string eventName)

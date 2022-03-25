@@ -12,7 +12,7 @@ public class GameClient
     private WebSocket ws;
     protected Action<List<RobotStats>> OnSetupCallback;
     protected UnityAction<GameReadyMessage> OnGameReady;
-    protected UnityAction<GameEvent[], byte> onTurnCallback;
+    protected UnityAction<List<GameEvent>, byte> onTurnCallback;
 
     public GameClient(string psid, string ipAddress, int p, Action<List<RobotStats>> callback, UnityAction<string> reject)
     {
@@ -113,15 +113,20 @@ public class GameClient
     protected void OnTurnEvents(TurnEventsMessage msg)
     {
         Debug.Log("Received Turn Events");
-        onTurnCallback(msg.events, msg.turn);
+        onTurnCallback(msg.events.ConvertAll(s => {
+            Debug.Log("Event | " + s);
+            GameEvent evt = JsonUtility.FromJson<GameEvent>(s);
+            evt.json = s;
+            return evt;
+        }), msg.turn);
     }
 
     protected void OnOpponentWaiting()
     {
-        BaseGameManager.getUi().LightUpPanel(false);
+        BaseGameManager.getUi().opponentSubmitted = true;
     }
     
-    internal void SendSubmitCommands (List<Command> commands, string owner, UnityAction<GameEvent[], byte> callback) {
+    internal void SendSubmitCommands (List<Command> commands, string owner, UnityAction<List<GameEvent>, byte> callback) {
         SubmitCommandsMessage msg = new SubmitCommandsMessage();
         msg.commands = commands;
         msg.name = "SUBMIT_COMMANDS";

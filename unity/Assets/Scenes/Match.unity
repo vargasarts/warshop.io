@@ -134,6 +134,14 @@ PrefabInstance:
       propertyPath: m_textAlignment
       value: 65535
       objectReference: {fileID: 0}
+    - target: {fileID: 1740489267156824317, guid: dc48de9fa871dad48b78492b0d2a413e, type: 3}
+      propertyPath: m_Color.g
+      value: 0.5019608
+      objectReference: {fileID: 0}
+    - target: {fileID: 1740489267156824317, guid: dc48de9fa871dad48b78492b0d2a413e, type: 3}
+      propertyPath: m_Color.r
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1857093922160505179, guid: dc48de9fa871dad48b78492b0d2a413e, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -238,6 +246,14 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2180264, guid: 2e498d1c8094910479dc3e1b768306a4, type: 2}
+    - target: {fileID: 7168779605406496905, guid: dc48de9fa871dad48b78492b0d2a413e, type: 3}
+      propertyPath: m_Color.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7168779605406496905, guid: dc48de9fa871dad48b78492b0d2a413e, type: 3}
+      propertyPath: m_Color.g
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dc48de9fa871dad48b78492b0d2a413e, type: 3}
 --- !u!1001 &7131221212857041850
