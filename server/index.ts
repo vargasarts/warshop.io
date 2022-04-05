@@ -176,7 +176,8 @@ const onSubmitCommands = (
     }
     storeCommands(game, p, commands);
     if (game.primary.ready && game.secondary.ready) {
-      const events = commandsToEvents(game as Required<Game>);
+      const eventJsons = commandsToEvents(game as Required<Game>);
+      const events = eventJsons.map(e => JSON.stringify(e));
       game.primary.ws.send(
         JSON.stringify({
           name: "TURN_EVENTS",
@@ -191,7 +192,7 @@ const onSubmitCommands = (
           turn: game.turn,
         })
       );
-      console.log("events sent: ", JSON.stringify(events, null, 4));
+      console.log("events sent: ", JSON.stringify(eventJsons, null, 4));
     } else {
       const otherWs =
         game.primary.ws === ws ? game.secondary.ws : game.primary.ws;
