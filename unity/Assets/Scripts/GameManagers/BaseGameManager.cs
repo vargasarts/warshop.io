@@ -23,6 +23,8 @@ public class BaseGameManager
     private List<RobotStats> roster;
     private Action SetupNextTurn;
 
+    private static List<GameEvent> latestEvents;
+    private static byte latestTurn;
     private static BaseGameManager instance;
 
     public static void Initialize(string playerSessionId, string ipAddress, int port, Action callback, UnityAction<string> reject)
@@ -109,7 +111,11 @@ public class BaseGameManager
         List<Command> commands = GetSubmittedCommands(robotControllers.Values.ToList());
         uiController.actionButtonContainer.SetButtons(false);
         uiController.robotButtonContainer.SetButtons(false);
-        gameClient.SendSubmitCommands(commands, myName, PlayEvents);
+        gameClient.SendSubmitCommands(commands, myName, (e, t) => {
+            latestEvents = e;
+            latestTurn = t;
+            uiController.submitted = true;
+        });
     }
 
     private List<Command> GetSubmittedCommands(List<RobotController> robotsToSubmit)
@@ -202,6 +208,11 @@ public class BaseGameManager
         else PlayEvent(events, index + 1);
     }
 
+    public static void PlayEvents()
+    {
+        instance.PlayEvents(latestEvents, latestTurn);
+    }
+
     private void PlayEvents(List<GameEvent> events, byte turn)
     {
         uiController.DimPanel(false);
@@ -219,7 +230,7 @@ public class BaseGameManager
             uiController.opponentSubmitted = false;
 
             currentHistoryIndex = history.Count;
-            turnNumber += turn;
+            turnNumber = turn;
             history.Add(SerializeState((byte)(turnNumber), GameConstants.MAX_PRIORITY));
         };
     }

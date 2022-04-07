@@ -11,6 +11,7 @@ public class UIController : MonoBehaviour
 	public Image opponentBackground;
     public RobotPanelsContainerController opponentsRobots;
     public TextMeshPro opponentsPlayerName;
+    public bool submitted = false;
     public bool opponentSubmitted = false;
     public Image myBackground;
     public RobotPanelsContainerController myRobots;
@@ -85,8 +86,12 @@ public class UIController : MonoBehaviour
             submitCommands.Click();
         }
         if (opponentSubmitted) {
-            DimPanel(false);
             opponentSubmitted = false;
+            DimPanel(false);
+        }
+        if (submitted) {
+            submitted = false;
+            BaseGameManager.PlayEvents();
         }
     }
 
