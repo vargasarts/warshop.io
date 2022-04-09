@@ -149,8 +149,8 @@ public class BaseGameManager
             currentHistoryIndex++;
         }
         boardController.DiffBattery(e.primaryBatteryCost, e.secondaryBatteryCost);
-        if (e is ResolveEvent) {
-            ResolveEvent re = (ResolveEvent)e;
+        if (e.type == ResolveEvent.EVENT_ID) {
+            ResolveEvent re = JsonUtility.FromJson<ResolveEvent>(e.json);
             uiController.HighlightCommands(re.priority);
             Counter animationsToPlay = new Counter(re.GetNumResolutions());
             UnityAction callback = () => {
@@ -177,11 +177,21 @@ public class BaseGameManager
             re.missedAttacks.ConvertAll(ToVector).ForEach(v => boardController.DisplayMiss(v, callback));
             re.robotIdsBlocked.ForEach(r => robotControllers[r].DisplayBlocked(callback));
         }
-        else if (e is SpawnEvent) robotControllers[((SpawnEvent)e).robotId].displaySpawnRequest(Next);
-        else if (e is MoveEvent) robotControllers[((MoveEvent)e).robotId].displayMoveRequest(ToVector(((MoveEvent)e).destinationPos), Next);
-        else if (e is AttackEvent) ((AttackEvent)e).locs.ConvertAll(ToVector).ForEach(v => robotControllers[((AttackEvent)e).robotId].displayAttack(v, Next));
-        else if (e is DeathEvent) {
-            robotControllers[((DeathEvent)e).robotId].displayDeath(((DeathEvent)e).returnHealth, (RobotController primaryRobot) =>
+        else if (e.type == SpawnEvent.EVENT_ID) {
+            SpawnEvent se = JsonUtility.FromJson<SpawnEvent>(e.json);
+            robotControllers[se.robotId].displaySpawnRequest(Next);
+        }
+        else if (e.type == MoveEvent.EVENT_ID) {
+            MoveEvent me = JsonUtility.FromJson<MoveEvent>(e.json);
+            robotControllers[me.robotId].displayMoveRequest(ToVector(me.destinationPos), Next);
+        }
+        else if (e.type == AttackEvent.EVENT_ID) {
+            AttackEvent ae = JsonUtility.FromJson<AttackEvent>(e.json);
+            ae.locs.ConvertAll(ToVector).ForEach(v => robotControllers[ae.robotId].displayAttack(v, Next));
+        }
+        else if (e.type == DeathEvent.EVENT_ID) {
+            DeathEvent de = JsonUtility.FromJson<DeathEvent>(e.json);
+            robotControllers[de.robotId].displayDeath(((DeathEvent)e).returnHealth, (RobotController primaryRobot) =>
             {
                 boardController.UnplaceRobot(primaryRobot);
                 DockController dock = !primaryRobot.isOpponent ? boardController.myDock : boardController.opponentDock;
@@ -190,9 +200,9 @@ public class BaseGameManager
                 Next();
             });
         }
-        else if (e is EndEvent)
+        else if (e.type == EndEvent.EVENT_ID)
         {
-            EndEvent evt = (EndEvent)e;
+            EndEvent evt = JsonUtility.FromJson<EndEvent>(e.json);
             Counter animationsToPlay = new Counter((evt.primaryLost ? 1 : 0) + (evt.secondaryLost ? 1 : 0));
             UnityAction callback = () => {
                 animationsToPlay.Decrement();
@@ -205,7 +215,7 @@ public class BaseGameManager
             if (evt.primaryLost) boardController.GetMyBattery().DisplayEnd(callback);
             if (evt.secondaryLost) boardController.GetOpponentBattery().DisplayEnd(callback);
         }
-        else PlayEvent(events, index + 1);
+        else throw new Exception("Unsupported event: " + e.json);
     }
 
     public static void PlayEvents()
@@ -216,7 +226,6 @@ public class BaseGameManager
     private void PlayEvents(List<GameEvent> events, byte turn)
     {
         uiController.DimPanel(false);
-        PlayEvent(events, 0);
         SetupNextTurn = () => {
             robotControllers.Values.ToList().ForEach(SetupRobotTurn);
 
@@ -233,6 +242,7 @@ public class BaseGameManager
             turnNumber = turn;
             history.Add(SerializeState((byte)(turnNumber), GameConstants.MAX_PRIORITY));
         };
+        PlayEvent(events, 0);
     }
 
     private void SetupRobotTurn(RobotController r)

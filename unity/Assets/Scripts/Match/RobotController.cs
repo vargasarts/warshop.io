@@ -87,6 +87,7 @@ public class RobotController : MonoBehaviour
 
     public void displaySpawnRequest(UnityAction robotCallback)
     {
+        Debug.Log(id + " is displaying a requested spawn");
         animatorHelper.Animate("SpawnRequest", robotCallback);
     }
 

@@ -112,9 +112,7 @@ public class GameClient
 
     protected void OnTurnEvents(TurnEventsMessage msg)
     {
-        Debug.Log("Received Turn Events");
         onTurnCallback(msg.events.ConvertAll(s => {
-            Debug.Log("Event | " + s);
             GameEvent evt = JsonUtility.FromJson<GameEvent>(s);
             evt.json = s;
             return evt;
