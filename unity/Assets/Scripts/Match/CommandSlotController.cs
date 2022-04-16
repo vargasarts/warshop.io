@@ -29,7 +29,7 @@ public class CommandSlotController : MonoBehaviour
         myClick();
     }
 
-    internal void Initialize(short rid, int i, byte p)
+    internal void Initialize(int rid, int i, byte p)
     {
         if (i > p)
         {

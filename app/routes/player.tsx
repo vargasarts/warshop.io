@@ -1,11 +1,13 @@
-import React, { useEffect, useRef, useState } from "react";
-import useHandler from "@dvargas92495/ui/dist/useHandler";
-import Button from "@mui/material/Button";
-import type { Handler as GetGames } from "../functions/games/get";
-import type { Handler as CreateGame } from "../functions/game/post";
-import type { Handler as JoinGame } from "../functions/join/post";
-import type { Robot, RobotStats, Command } from "../server/game";
-import type { Map } from "../server/map";
+import React, {useEffect,useRef,useState } from "react";
+import type {Handler as GetGames } from "../../functions/games/get";
+import type {Handler as JoinGame } from "../../functions/join/post";
+import type {
+ Robot,
+ RobotStats,
+ Command,
+} from "../../server/game";
+import type {Map } from "../../server/map";
+import axios from "axios";
 
 type GameViews = Awaited<ReturnType<GetGames>>["gameViews"];
 type JoinInfo = Awaited<ReturnType<JoinGame>>;
@@ -15,10 +17,10 @@ const GameSession = (
   g: GameViews[number] & { onJoin: (p: JoinInfo) => void }
 ) => {
   const [password, setPassword] = useState("");
-  const joinGame = useHandler<JoinGame>({
-    path: "join",
-    method: "POST",
-  });
+  // const joinGame = useHandler<JoinGame>({
+  //   path: "join",
+  //   method: "POST",
+  // });
   return (
     <div
       style={{
@@ -37,19 +39,19 @@ const GameSession = (
           type={"password"}
         />
       )}
-      <Button
-        color={"primary"}
-        variant={"contained"}
+      <button
         onClick={() =>
-          joinGame({
-            playerId: PLAYER_ID,
-            gameSessionId: g.gameSessionId || "",
-            password,
-          }).then(g.onJoin)
+          axios
+            .post(`${process.env.API_URL}/join`, {
+              playerId: PLAYER_ID,
+              gameSessionId: g.gameSessionId || "",
+              password,
+            })
+            .then((r) => g.onJoin(r.data))
         }
       >
         Join
-      </Button>
+      </button>
     </div>
   );
 };
@@ -59,18 +61,12 @@ const LobbyScene = ({
 }: {
   onJoin: (p: JoinInfo) => void;
 }): React.ReactElement => {
-  const getGames = useHandler<GetGames>({
-    path: "games",
-    method: "GET",
-  });
-  const createGame = useHandler<CreateGame>({
-    path: "game",
-    method: "POST",
-  });
   const [games, setGames] = useState<GameViews>([]);
   useEffect(() => {
-    getGames().then((r) => setGames(r.gameViews));
-  }, [getGames, setGames]);
+    axios
+      .get(`${process.env.API_URL}/games`)
+      .then((r) => setGames(r.data.gameViews));
+  }, [setGames]);
   return (
     <div style={{ margin: 64 }}>
       <div
@@ -83,13 +79,13 @@ const LobbyScene = ({
         <span>New Game</span>
         <span>{PLAYER_ID}</span>
         <input />
-        <Button
-          color={"primary"}
-          variant={"contained"}
-          onClick={() => createGame({ playerId: "Web" })}
+        <button
+          onClick={() =>
+            axios.post(`${process.env.API_URL}/game`, { playerId: "Web" })
+          }
         >
           Create
-        </Button>
+        </button>
       </div>
       {games.map((g) => (
         <GameSession {...g} onJoin={onJoin} />

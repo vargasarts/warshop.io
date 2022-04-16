@@ -135,7 +135,7 @@ public class UIController : MonoBehaviour
         ChangeLayer(container.gameObject, layer);
     }
 
-    public void BindUiToRobotController(short robotId, RobotController robotController)
+    public void BindUiToRobotController(int robotId, RobotController robotController)
     {
         MenuItemController robotButton = Instantiate(genericButton, robotButtonContainer.transform);
         RobotPanelsContainerController container = robotController.isOpponent ? opponentsRobots : myRobots;
@@ -149,7 +149,7 @@ public class UIController : MonoBehaviour
         container.BindCommandClickCallback(robotController, CommandSlotClickCallback);
     }
 
-    private void RobotButtonCallback(MenuItemController robotButton, RobotController robotController, short robotId)
+    private void RobotButtonCallback(MenuItemController robotButton, RobotController robotController, int robotId)
     {
         RobotButtonSelect(robotButton, robotController);
         commandButtonContainer.EachMenuItemSet(c => CommandButtonCallback(c, robotButton, robotController));
@@ -210,7 +210,7 @@ public class UIController : MonoBehaviour
         directionButtonContainer.EachMenuItem(m => m.ClearSprite());
     }
 
-    public void ClearCommands(short id, bool isOpponent)
+    public void ClearCommands(int id, bool isOpponent)
     {
         RobotPanelsContainerController robotPanelsContainer = isOpponent ? opponentsRobots : myRobots;
         robotPanelsContainer.ClearCommands(id);
@@ -222,13 +222,13 @@ public class UIController : MonoBehaviour
         opponentsRobots.HighlightCommands(p);
     }
 
-    public void ColorCommandsSubmitted(short id, bool isOpponent)
+    public void ColorCommandsSubmitted(int id, bool isOpponent)
     {
         RobotPanelsContainerController robotPanelsContainer = isOpponent ? opponentsRobots : myRobots;
         robotPanelsContainer.ColorCommandsSubmitted(id);
     }
 
-    public void AddSubmittedCommand(Command cmd, short id, bool isOpponent)
+    public void AddSubmittedCommand(Command cmd, int id, bool isOpponent)
     {
         Sprite s = cmd.commandId == Command.SPAWN_COMMAND_ID ? queueSprites[cmd.direction] : GetArrow(Command.GetDisplay[cmd.commandId]);
         RobotPanelsContainerController robotPanelsContainer = isOpponent ? opponentsRobots : myRobots;

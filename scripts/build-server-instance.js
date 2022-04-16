@@ -16,8 +16,8 @@ const getDotEnvObject = () => {
 
 esbuild
   .build({
-    entryPoints: ["server/index.ts"],
-    outfile: "dist/index.js",
+    entryPoints: ["server/instance.ts"],
+    outfile: "dist/instance.js",
     platform: "node",
     bundle: true,
     define: getDotEnvObject(),

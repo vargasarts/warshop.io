@@ -4,6 +4,7 @@ dist
 out
 .env
 _fuego
+.cache
 
 unity/Library
 unity/Temp

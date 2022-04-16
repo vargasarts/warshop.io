@@ -1,13 +1,13 @@
 import {
-  BatterySpace,
-  BATTERY_SPACE_ID,
-  Map,
-  NULL_VEC,
-  QueueSpace,
-  QUEUE_SPACE_ID,
-  Space,
+  value BatterySpace,
+  value BATTERY_SPACE_ID,
+  value Map,
+  value NULL_VEC,
+  value QueueSpace,
+  value QUEUE_SPACE_ID,
+  value Space,
 } from "./map";
-import { WebSocket } from "ws";
+import { value WebSocket } from "ws";
 
 type Position = {
   x: number;
@@ -89,13 +89,13 @@ type AttackEvent = GameEventBase & {
 
 type ResolveEvent = GameEventBase & {
   type: typeof RESOLVE_EVENT_ID;
-  robotIdToSpawn: { [id: number]: Position };
-  robotIdToMove: { [id: number]: Position };
-  robotIdToHealth: { [id: number]: number };
+  robotIdToSpawn: number[];
+  robotIdToMove: number[];
+  robotIdToHealth: number[];
+  missedAttacks: number[];
+  robotIdsBlocked: number[];
   myBatteryHit: boolean;
   opponentBatteryHit: boolean;
-  missedAttacks: Set<Position>;
-  robotIdsBlocked: Set<number>;
 };
 
 type DeathEvent = GameEventBase & {
@@ -308,8 +308,7 @@ export const commandsToEvents = (game: LiveGame): GameEvent[] => {
     });
 
     if (priorityEvents.length > 0) {
-      const resolveEvent: ResolveEvent = {
-        type: RESOLVE_EVENT_ID,
+      const resolveEvent = {
         robotIdToSpawn: Object.fromEntries(
           priorityEvents
             .filter((e): e is SpawnEvent => e.type === SPAWN_EVENT_ID)
@@ -320,9 +319,9 @@ export const commandsToEvents = (game: LiveGame): GameEvent[] => {
             .filter((e): e is MoveEvent => e.type === MOVE_EVENT_ID)
             .map((e) => [e.robotId, e.destinationPos])
         ),
-        robotIdToHealth: {},
-        robotIdsBlocked: new Set(),
-        missedAttacks: new Set(),
+        robotIdToHealth: {} as Record<number, number>,
+        robotIdsBlocked: new Set<number>(),
+        missedAttacks: new Set<Position>(),
         primaryBatteryCost: 0,
         secondaryBatteryCost: 0,
         priority: p,
@@ -442,7 +441,19 @@ export const commandsToEvents = (game: LiveGame): GameEvent[] => {
           valid = false;
         });
       }
-      priorityEvents.push(resolveEvent);
+      priorityEvents.push({
+        ...resolveEvent,
+        type: RESOLVE_EVENT_ID,
+        robotIdToSpawn: Object.entries(resolveEvent.robotIdToSpawn).flatMap(
+          ([k, p]) => [Number(k), p.x, p.y]
+        ),
+        robotIdToMove: Object.entries(resolveEvent.robotIdToMove).flatMap(
+          ([k, p]) => [Number(k), p.x, p.y]
+        ),
+        robotIdToHealth: Object.entries(resolveEvent.robotIdToHealth).flatMap(([k,v]) => [Number(k),v]),
+        robotIdsBlocked: Array.from(resolveEvent.robotIdsBlocked),
+        missedAttacks: Array.from(resolveEvent.missedAttacks).flatMap(p => [p.x, p.y]),
+      });
 
       const delayResolved = Object.keys(resolveEvent.robotIdToHealth).filter(
         (h) =>
@@ -460,11 +471,13 @@ export const commandsToEvents = (game: LiveGame): GameEvent[] => {
         );
         const delayResolveEvent: ResolveEvent = {
           type: RESOLVE_EVENT_ID,
-          robotIdToSpawn: {},
-          robotIdToMove: {},
-          robotIdToHealth: delayedRobotIdToHealth,
-          robotIdsBlocked: new Set(),
-          missedAttacks: new Set(),
+          robotIdToSpawn: [],
+          robotIdToMove: [],
+          robotIdToHealth: Object.entries(delayedRobotIdToHealth).flatMap(
+            ([k, p]) => [Number(k), p]
+          ),
+          robotIdsBlocked: [],
+          missedAttacks: [],
           primaryBatteryCost: 0,
           secondaryBatteryCost: 0,
           priority: p,

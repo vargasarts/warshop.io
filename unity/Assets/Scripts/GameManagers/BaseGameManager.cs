@@ -14,7 +14,7 @@ public class BaseGameManager
     private List<Robot> opponentTeam;
     private GameClient gameClient;
     private UIController uiController;
-    private Dictionary<short, RobotController> robotControllers;
+    private Dictionary<int, RobotController> robotControllers;
 
     private byte turnNumber = 1;
     private int currentHistoryIndex;
@@ -71,7 +71,7 @@ public class BaseGameManager
 
     private void InitializeRobots()
     {
-        robotControllers = new Dictionary<short, RobotController>(myTeam.Count() + opponentTeam.Count());
+        robotControllers = new Dictionary<int, RobotController>(myTeam.Count() + opponentTeam.Count());
         InitializePlayerRobots(myTeam, boardController.myDock);
         InitializePlayerRobots(opponentTeam, boardController.opponentDock);
     }
@@ -157,24 +157,26 @@ public class BaseGameManager
                 animationsToPlay.Decrement();
                 if (animationsToPlay.Get() <= 0) Next();
             };
-            re.robotIdToSpawn.ForEach(p => {
-                RobotController primaryRobot = robotControllers[p.Item1];
+            for (int jndex = 0; jndex < re.robotIdToSpawn.Count; jndex+=3) {
+                RobotController primaryRobot = robotControllers[re.robotIdToSpawn[jndex]];
                 (primaryRobot.isOpponent ? boardController.opponentDock : boardController.myDock).RemoveFromBelt(primaryRobot.transform.localPosition);
                 primaryRobot.transform.parent = boardController.transform;
-                boardController.PlaceRobot(primaryRobot, p.Item2.Item1, p.Item2.Item2);
+                boardController.PlaceRobot(primaryRobot, re.robotIdToSpawn[jndex + 1], re.robotIdToSpawn[jndex + 2]);
                 primaryRobot.displaySpawn(callback);
-            });
-            re.robotIdToMove.ForEach(p => {
-                RobotController primaryRobot = robotControllers[p.Item1];
-                primaryRobot.displayMove(ToVector(p.Item2), boardController, callback);
-            });
-            re.robotIdToHealth.ForEach(t => {
-                RobotController primaryRobot = robotControllers[t.Item1];
-                primaryRobot.displayDamage(t.Item2, callback);
-            });
+            };
+            for (int jndex = 0; jndex < re.robotIdToMove.Count; jndex+=3) {
+                RobotController primaryRobot = robotControllers[re.robotIdToMove[jndex]];
+                primaryRobot.displayMove(new Vector2Int(re.robotIdToMove[jndex] + 1, re.robotIdToMove[jndex]+2), boardController, callback);
+            };
+            for (int jndex = 0; jndex < re.robotIdToHealth.Count; jndex+=2) {
+                RobotController primaryRobot = robotControllers[re.robotIdToHealth[jndex]];
+                primaryRobot.displayDamage(re.robotIdToHealth[jndex + 1], callback);
+            };
             if (re.myBatteryHit) boardController.GetMyBattery().DisplayDamage(callback);
             if (re.opponentBatteryHit) boardController.GetOpponentBattery().DisplayDamage(callback);
-            re.missedAttacks.ConvertAll(ToVector).ForEach(v => boardController.DisplayMiss(v, callback));
+            for (int jndex = 0; jndex < re.missedAttacks.Count; jndex+=2) {
+                 boardController.DisplayMiss(new Vector2Int(re.missedAttacks[jndex], re.missedAttacks[jndex+1]), callback);
+            }
             re.robotIdsBlocked.ForEach(r => robotControllers[r].DisplayBlocked(callback));
         }
         else if (e.type == SpawnEvent.EVENT_ID) {

@@ -5,18 +5,21 @@
   "license": "MIT",
   "repository": "dvargas92495/warshop.io",
   "scripts": {
+    "tailwind": "npm run generate:css -- --watch",
+    "generate:css": "tailwindcss -o ./app/tailwind.css",
     "format": "prettier --write \"**/*.tsx\"",
     "lint": "eslint . --ext .ts,.tsx",
     "api": "fuego api",
+    "prebuild": "npm run generate:css -- --minify",
     "build": "fuego build",
     "deploy": "fuego deploy",
-    "fe": "fuego fe",
+    "dev": "fuego dev",
     "compile": "fuego compile",
     "publish": "fuego publish",
     "gamelift": "java -jar GameLiftLocal.jar -p 9080",
-    "preserver": "node scripts/build-server.js",
-    "server": "node dist/index.js",
-    "start": "concurrently \"npm:gamelift\" \"npm:server 12345\" \"npm:server 12346\" \"npm:server 12347\" \"npm:api\" \"npm:fe\""
+    "preserver": "node scripts/build-server-instance.js",
+    "server": "node dist/instance.js",
+    "start": "concurrently \"npm:gamelift\" \"npm:server 12345\" \"npm:server 12346\" \"npm:server 12347\" \"npm:api\" \"npm:dev\" \"npm:tailwind\""
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.83",
@@ -30,8 +33,9 @@
     "concurrently": "^6.4.0",
     "esbuild": "^0.12.24",
     "eslint": "^7.32.0",
-    "fuegojs": "^0.16.2",
+    "fuegojs": "^0.25.8",
     "prettier": "^2.3.2",
+    "tailwindcss": "^3.0.24",
     "tslint-config-prettier": "^1.18.0",
     "tslint-react-hooks": "^2.2.2",
     "typescript": "^4.5.2"
@@ -39,9 +43,10 @@
   "dependencies": {
     "@dplusic/gamelift-nodejs-serversdk": "0.0.1",
     "@dvargas92495/api": "^0.2.4",
-    "@dvargas92495/ui": "^0.44.4",
+    "@dvargas92495/ui": "^0.52.9",
     "aws-sdk": "^2.981.0",
     "aws-sdk-plus": "^0.4.2",
+    "axios": "^0.26.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "uuid": "^8.3.2",

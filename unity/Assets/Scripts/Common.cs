@@ -21,8 +21,8 @@ public class RobotStats
 {
     public string name;
     public byte priority;
-    public short health;
-    public short attack;
+    public int health;
+    public int attack;
     public string uuid;
 }
 
@@ -30,8 +30,8 @@ public class RobotStats
 public class Robot : RobotStats
 {
     public string description;
-    public short startingHealth;
-    public short id;
+    public int startingHealth;
+    public int id;
     internal Robot(string _name)
     {
         name = _name;
@@ -53,7 +53,7 @@ public class Command
     public const byte MOVE_COMMAND_ID = 1;
     public const byte ATTACK_COMMAND_ID = 2;
     public const byte SPECIAL_COMMAND_ID = 3;
-    public short robotId;
+    public int robotId;
     public byte direction;
     public byte commandId;
     public Command(byte dir, byte id)
@@ -107,14 +107,14 @@ public class BatterySpace: Space {
 public class QueueSpace: Space {
     public const byte ID = 4;  
     public bool isPrimary;
-    public short index;
+    public int index;
 }
 
 [Serializable]
 public class GameEvent {
     public byte priority;
-    public short primaryBatteryCost;
-    public short secondaryBatteryCost;
+    public int primaryBatteryCost;
+    public int secondaryBatteryCost;
     public byte type;
     public string json;
 }
@@ -123,13 +123,14 @@ public class GameEvent {
 [Serializable]
 public class ResolveEvent: GameEvent {
     internal const byte EVENT_ID = 12;
-    public List<Tuple<short, Tuple<int, int>>> robotIdToSpawn;
-    public List<Tuple<short, Tuple<int, int>>> robotIdToMove;
-    public List<Tuple<short, short>> robotIdToHealth;
+    // TUPLES DONT SERIALIZE
+    public List<int> robotIdToSpawn; // id, x, y
+    public List<int> robotIdToMove; // id, x, y
+    public List<int> robotIdToHealth; // id, h
+    public List<int> missedAttacks; // id, dir
     public bool myBatteryHit;
     public bool opponentBatteryHit;
-    public List<Tuple<int, int>> missedAttacks;
-    public List<short> robotIdsBlocked;
+    public List<int> robotIdsBlocked;
     public int GetNumResolutions()
     {
         return robotIdToSpawn.Count
@@ -147,14 +148,14 @@ public class EndEvent: GameEvent {
     internal const byte EVENT_ID = 13;
     public bool primaryLost;
     public bool secondaryLost;
-    public short turnCount;
+    public int turnCount;
 }
 
 [Serializable]
 public class SpawnEvent: GameEvent
 {
     internal const byte EVENT_ID = 1;
-    public short robotId;
+    public int robotId;
 }
 
 [Serializable]
@@ -163,7 +164,7 @@ public class MoveEvent: GameEvent
     internal const byte EVENT_ID = 2;
     public Tuple<int, int> sourcePos;
     public Tuple<int, int> destinationPos;
-    public short robotId;
+    public int robotId;
 }
 
 [Serializable]
@@ -171,15 +172,15 @@ public class AttackEvent: GameEvent
 {
     internal const byte EVENT_ID = 3;
     public List<Tuple<int, int>> locs;
-    public short robotId;
+    public int robotId;
 }
 
 [Serializable]
 public class DeathEvent: GameEvent
 {
     internal const byte EVENT_ID = 9;
-    public short robotId;
-    public short returnHealth;
+    public int robotId;
+    public int returnHealth;
 }
 
 [Serializable]

@@ -14,13 +14,13 @@ public class RobotController : MonoBehaviour
     public TextMesh attackLabel;
     public GameObject[] robotModels;
 
-    internal short id { get; private set; }
+    internal int id { get; private set; }
     internal bool isSpawned;
     internal bool isOpponent;
     internal List<SpriteRenderer> currentEvents = new List<SpriteRenderer>();
     internal List<Command> commands = new List<Command>();
 
-    public void LoadModel(string n, short i)
+    public void LoadModel(string n, int i)
     {
         id = i;
         GameObject model = new List<GameObject>(robotModels).Find(g => g.name.Equals(n));
@@ -32,7 +32,7 @@ public class RobotController : MonoBehaviour
      * Robot Model Before Turn Methods *
      ***********************************/
 
-    internal void AddRobotCommand(Command cmd, UnityAction<Command, short, bool> callback)
+    internal void AddRobotCommand(Command cmd, UnityAction<Command, int, bool> callback)
     {
         int num = GetNumCommandType(cmd.commandId);
         if (num < Command.limit[cmd.commandId])
@@ -65,7 +65,7 @@ public class RobotController : MonoBehaviour
         }
     }
 
-    internal void AddRobotCommand(string name, byte dir, UnityAction<Command, short, bool> callback)
+    internal void AddRobotCommand(string name, byte dir, UnityAction<Command, int, bool> callback)
     {
         if (name.Equals(Command.GetDisplay[Command.SPAWN_COMMAND_ID]))
         {
@@ -87,7 +87,6 @@ public class RobotController : MonoBehaviour
 
     public void displaySpawnRequest(UnityAction robotCallback)
     {
-        Debug.Log(id + " is displaying a requested spawn");
         animatorHelper.Animate("SpawnRequest", robotCallback);
     }
 
@@ -121,13 +120,13 @@ public class RobotController : MonoBehaviour
         animatorHelper.Animate("Attack" + getDir(v), robotCallback);
     }
 
-    public void displayDamage(short h, UnityAction robotCallback)
+    public void displayDamage(int h, UnityAction robotCallback)
     {
         displayHealth(h);
         animatorHelper.Animate("Damage", robotCallback);
     }
 
-    public void displayDeath(short health, UnityAction<RobotController> robotCallback)
+    public void displayDeath(int health, UnityAction<RobotController> robotCallback)
     {
         animatorHelper.Animate("Death", () => {
             displayHealth(health);
@@ -136,24 +135,24 @@ public class RobotController : MonoBehaviour
         });
     }
 
-    public void displayHealth(short health)
+    public void displayHealth(int health)
     {
         healthLabel.text = health.ToString();
     }
 
-    public void displayAttack(short attack)
+    public void displayAttack(int attack)
     {
         attackLabel.text = attack.ToString();
     }
 
-    public short GetHealth()
+    public int GetHealth()
     {
-        return short.Parse(healthLabel.text);
+        return int.Parse(healthLabel.text);
     }
 
-    public short GetAttack()
+    public int GetAttack()
     {
-        return short.Parse(attackLabel.text);
+        return int.Parse(attackLabel.text);
     }
 
     private string getDir(Vector2Int v)

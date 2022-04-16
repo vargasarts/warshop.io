@@ -11,12 +11,12 @@ public class CommandSlotContainerController : MonoBehaviour
 
     private List<CommandSlotController> commandSlots;
 
-    public void Initialize(short robotId, byte robotPriority)
+    public void Initialize(int robotId, byte robotPriority)
     {
         commandSlots = Enumerable.Range(0, GameConstants.MAX_PRIORITY).ToList().ConvertAll(c => InitializeCommand(c, robotId, robotPriority));
     }
 
-    private CommandSlotController InitializeCommand(int c, short robotId, byte robotPriority)
+    private CommandSlotController InitializeCommand(int c, int robotId, byte robotPriority)
     {
         CommandSlotController cmd = Instantiate(commandSlot, transform);
         cmd.Initialize(robotId, c + 1, robotPriority);

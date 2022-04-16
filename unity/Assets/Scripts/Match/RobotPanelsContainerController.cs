@@ -8,14 +8,14 @@ public class RobotPanelsContainerController : MonoBehaviour
     public RobotPanelController RobotPanel;
     public Sprite[] robotSprites;
 
-    private Dictionary<short, RobotPanelController> robotIdToPanels;
+    private Dictionary<int, RobotPanelController> robotIdToPanels;
 
     public void Initialize(int teamSize)
     {
-        robotIdToPanels = new Dictionary<short, RobotPanelController>(teamSize);
+        robotIdToPanels = new Dictionary<int, RobotPanelController>(teamSize);
     }
 
-    public bool Contains(short id)
+    public bool Contains(int id)
     {
         return robotIdToPanels.ContainsKey(id);
     }
@@ -30,7 +30,7 @@ public class RobotPanelsContainerController : MonoBehaviour
         panel.commandSlotContainer.Initialize(r.id, r.priority);
 
         robotIdToPanels.Add(r.id, panel);
-        List<short> robotIds = robotIdToPanels.Keys.ToList();
+        List<int> robotIds = robotIdToPanels.Keys.ToList();
         robotIds.Sort();
         int i = robotIds.IndexOf(r.id);
         panel.transform.localPosition = Vector3.right * (1.0f/4 * (i + 0.5f) - 0.5f);
@@ -41,12 +41,12 @@ public class RobotPanelsContainerController : MonoBehaviour
         robotIdToPanels[r.id].commandSlotContainer.BindCommandClickCallback(r, clickCallback);
     }
 
-    public Sprite GetSprite(short robotId)
+    public Sprite GetSprite(int robotId)
     {
         return robotIdToPanels[robotId].GetSprite();
     }
 
-    public void ClearCommands(short robotId)
+    public void ClearCommands(int robotId)
     {
         robotIdToPanels[robotId].ClearCommands();
     }
@@ -56,12 +56,12 @@ public class RobotPanelsContainerController : MonoBehaviour
         robotIdToPanels.Values.ToList().ForEach(panel => panel.commandSlotContainer.HighlightCommand(p));
     }
 
-    public void ColorCommandsSubmitted(short robotId)
+    public void ColorCommandsSubmitted(int robotId)
     {
         robotIdToPanels[robotId].commandSlotContainer.ColorCommandsSubmitted();
     }
 
-    public void AddSubmittedCommand(Command cmd, short robotId, Sprite s)
+    public void AddSubmittedCommand(Command cmd, int robotId, Sprite s)
     {
         robotIdToPanels[robotId].AddSubmittedCommand(cmd, s);
     }

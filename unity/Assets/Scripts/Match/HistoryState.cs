@@ -7,7 +7,7 @@ public class HistoryState
 {
     byte turnNumber;
     byte priority;
-    Dictionary<short, RobotState> robots;
+    Dictionary<int, RobotState> robots;
     List<TileState> tiles;
     int myScore;
     int opponentScore;
@@ -16,8 +16,8 @@ public class HistoryState
     {
         public Vector3 position;
         public Vector3 rotation;
-        public short health;
-        public short attack;
+        public int health;
+        public int attack;
         public List<CurrentEvent> currentEvents;
         public List<Cmd> commands;
 
@@ -46,9 +46,9 @@ public class HistoryState
         priority = p;
     }
 
-    public void SerializeRobots(Dictionary<short, RobotController> robotControllers)
+    public void SerializeRobots(Dictionary<int, RobotController> robotControllers)
     {
-        robots = new Dictionary<short, RobotState>(robotControllers.Count);
+        robots = new Dictionary<int, RobotState>(robotControllers.Count);
         robotControllers.Values.ToList().ForEach(SerializeRobot);
     }
 
@@ -99,12 +99,12 @@ public class HistoryState
         opponentScore = opponents;
     }
 
-    public void DeserializeRobots(Dictionary<short, RobotController> robotControllers, UnityAction<Command, short, bool> addCommandCallback)
+    public void DeserializeRobots(Dictionary<int, RobotController> robotControllers, UnityAction<Command, int, bool> addCommandCallback)
     {
         robots.Keys.ToList().ForEach((id) => DeserializeRobot(robotControllers[id], robots[id], addCommandCallback));
     }
 
-    private void DeserializeRobot(RobotController r, RobotState state, UnityAction<Command, short, bool> addCommandCallback)
+    private void DeserializeRobot(RobotController r, RobotState state, UnityAction<Command, int, bool> addCommandCallback)
     {
         r.transform.position = state.position;
         r.transform.rotation = Quaternion.Euler(state.rotation);
@@ -114,7 +114,7 @@ public class HistoryState
         state.commands.ForEach(c => DeserializeCmd(c, r, addCommandCallback));
     }
 
-    private void DeserializeCmd(RobotState.Cmd cmd, RobotController r, UnityAction<Command, short, bool> callback)
+    private void DeserializeCmd(RobotState.Cmd cmd, RobotController r, UnityAction<Command, int, bool> callback)
     {
         r.AddRobotCommand(cmd.name, cmd.dir, callback);
     }
