@@ -47,8 +47,10 @@ provider "github" {
 
 module "aws_static_site" {
   source  = "dvargas92495/static-site/aws"
-  version = "3.1.5"
+  version = "3.5.2"
 
+  origin_memory_size = 5120
+  origin_timeout = 20
   domain = "warshop.io"
   secret = var.secret
   tags = {
@@ -60,11 +62,20 @@ module "aws_static_site" {
   }
 }
 
+module "aws_clerk" {
+  source   = "dvargas92495/clerk/aws"
+  version  = "1.0.4"
+
+  zone_id  = module.aws_static_site.route53_zone_id
+  clerk_id = "ll3czywatvsp"
+}
+
 module "aws-serverless-backend" {
     source  = "dvargas92495/serverless-backend/aws"
-    version = "2.2.1"
+    version = "2.5.0"
 
     api_name = "warshop-io"
+    directory = "api"
 }
 
 resource "github_actions_secret" "deploy_aws_access_key" {
