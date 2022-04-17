@@ -1,13 +1,13 @@
 import {
-  value BatterySpace,
-  value BATTERY_SPACE_ID,
-  value Map,
-  value NULL_VEC,
-  value QueueSpace,
-  value QUEUE_SPACE_ID,
-  value Space,
+  BatterySpace,
+  BATTERY_SPACE_ID,
+  Map,
+  NULL_VEC,
+  QueueSpace,
+  QUEUE_SPACE_ID,
+  Space,
 } from "./map";
-import { value WebSocket } from "ws";
+import { WebSocket } from "ws";
 
 type Position = {
   x: number;
@@ -450,9 +450,14 @@ export const commandsToEvents = (game: LiveGame): GameEvent[] => {
         robotIdToMove: Object.entries(resolveEvent.robotIdToMove).flatMap(
           ([k, p]) => [Number(k), p.x, p.y]
         ),
-        robotIdToHealth: Object.entries(resolveEvent.robotIdToHealth).flatMap(([k,v]) => [Number(k),v]),
+        robotIdToHealth: Object.entries(resolveEvent.robotIdToHealth).flatMap(
+          ([k, v]) => [Number(k), v]
+        ),
         robotIdsBlocked: Array.from(resolveEvent.robotIdsBlocked),
-        missedAttacks: Array.from(resolveEvent.missedAttacks).flatMap(p => [p.x, p.y]),
+        missedAttacks: Array.from(resolveEvent.missedAttacks).flatMap((p) => [
+          p.x,
+          p.y,
+        ]),
       });
 
       const delayResolved = Object.keys(resolveEvent.robotIdToHealth).filter(
