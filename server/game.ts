@@ -236,7 +236,10 @@ const getQueuePosition = (
   const queueSpace = queueSpaces.find(
     (s) => s.index === i && s.isPrimary === isPrimary
   );
-  return { x: queueSpace?.x || -1, y: queueSpace?.y || -1 };
+  return {
+    x: typeof queueSpace?.x === "number" ? queueSpace.x : -1,
+    y: typeof queueSpace?.y === "number" ? queueSpace.y : -1,
+  };
 };
 
 export const commandsToEvents = (game: LiveGame): GameEvent[] => {

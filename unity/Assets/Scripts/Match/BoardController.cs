@@ -52,6 +52,9 @@ public class BoardController : MonoBehaviour
     public void PlaceRobot(RobotController robot, int x, int y)
     {
         TileController loc = FindTile(x, y);
+        if (loc == null) {
+            Debug.LogError("Could not find tile with coordinates: " + x + "," + y);
+        }
         loc.LoadRobotOnTileMesh(robot.isOpponent);
         robot.transform.localPosition = new Vector3(loc.transform.localPosition.x, loc.transform.localPosition.y, -loc.transform.localScale.z*0.1f);
     }
