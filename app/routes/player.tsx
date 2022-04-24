@@ -1,17 +1,13 @@
-import React, {useEffect,useRef,useState } from "react";
-import type {Handler as GetGames } from "../../functions/games/get";
-import type {Handler as JoinGame } from "../../functions/join/post";
-import type {
- Robot,
- RobotStats,
- Command,
-} from "../../server/game";
-import type {Map } from "../../server/map";
+import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "@remix-run/react";
+import type { Handler as GetGames } from "../../functions/games/get";
+import type { Handler as JoinGame } from "../../functions/join/post";
+import type { Robot, Command } from "../../server/game";
+import type { Map } from "../../server/map";
 import axios from "axios";
 
 type GameViews = Awaited<ReturnType<GetGames>>["gameViews"];
 type JoinInfo = Awaited<ReturnType<JoinGame>>;
-const PLAYER_ID = "Web";
 
 const GameSession = (
   g: GameViews[number] & { onJoin: (p: JoinInfo) => void }
@@ -43,7 +39,7 @@ const GameSession = (
         onClick={() =>
           axios
             .post(`${process.env.API_URL}/join`, {
-              playerId: PLAYER_ID,
+              playerId: "web",
               gameSessionId: g.gameSessionId || "",
               password,
             })
@@ -77,7 +73,7 @@ const LobbyScene = ({
         }}
       >
         <span>New Game</span>
-        <span>{PLAYER_ID}</span>
+        <span>{"web"}</span>
         <input />
         <button
           onClick={() =>
@@ -90,37 +86,6 @@ const LobbyScene = ({
       {games.map((g) => (
         <GameSession {...g} onJoin={onJoin} />
       ))}
-    </div>
-  );
-};
-
-const SetupScene = ({
-  ws,
-  myRoster,
-}: {
-  ws: WebSocket;
-  myRoster: RobotStats[];
-}) => {
-  return (
-    <div>
-      <button
-        onClick={() =>
-          ws.send(
-            JSON.stringify({
-              name: "START_GAME",
-              myRobots: myRoster.slice(0, 4).map((r) => r.uuid),
-              myName: PLAYER_ID,
-            })
-          )
-        }
-      >
-        Ready!
-      </button>
-      <ul>
-        {myRoster.map((r) => (
-          <li key={r.uuid}>{r.name}</li>
-        ))}
-      </ul>
     </div>
   );
 };
@@ -226,55 +191,38 @@ const MatchScene = ({
   );
 };
 
-type SetupProps = Omit<Parameters<typeof SetupScene>[0], "ws">;
-type MatchProps = Omit<Parameters<typeof MatchScene>[0], "ws">;
-
 const PlayerPage = (): React.ReactElement => {
-  const [scene, setScene] = useState("lobby");
-  const [setupProps, setSetupProps] = useState<SetupProps>();
-  const [matchProps, setMatchProps] = useState<MatchProps>();
   const websocketRef = useRef<WebSocket>();
+  const navigate = useNavigate();
   return (
     <>
-      <style>{`body {\n  font-family: sans-serif;\n}`}</style>
-      {scene === "lobby" ? (
-        <LobbyScene
-          onJoin={({ ipAddress, playerSessionId = "", port }) => {
-            const ws = (websocketRef.current = new WebSocket(
-              `ws://${ipAddress}:${port}`
-            ));
-            ws.onmessage = ({ data }) => {
-              const { name, ...props } = JSON.parse(data);
-              if (name === "LOAD_SETUP") {
-                setSetupProps(props);
-                setScene("setup");
-              } else if (name === "GAME_READY") {
-                setMatchProps(props);
-                setScene("match");
-              }
-            };
-            ws.onopen = () =>
-              ws.send(
-                JSON.stringify({
-                  name: "ACCEPT_PLAYER_SESSION",
-                  playerSessionId,
-                })
-              );
-          }}
-        />
-      ) : scene === "setup" ? (
-        <SetupScene
-          {...(setupProps as Required<SetupProps>)}
-          ws={websocketRef.current || new WebSocket("")}
-        />
-      ) : scene === "match" ? (
-        <MatchScene
-          {...(matchProps as Required<MatchProps>)}
-          ws={websocketRef.current || new WebSocket("")}
-        />
-      ) : (
-        <div>Invalid Scene: {scene}</div>
-      )}
+      <LobbyScene
+        onJoin={({ ipAddress, playerSessionId = "", port }) => {
+          const ws = (websocketRef.current = new WebSocket(
+            `ws://${ipAddress}:${port}`
+          ));
+          ws.onmessage = ({ data }) => {
+            const {
+              name,
+              //...props
+            } = JSON.parse(data);
+            if (name === "LOAD_SETUP") {
+              navigate(`/player/${name}/setup`);
+              // setSetupProps(props);
+            } else if (name === "GAME_READY") {
+              navigate(`/player/${name}/match`);
+              // setMatchProps(props);
+            }
+          };
+          ws.onopen = () =>
+            ws.send(
+              JSON.stringify({
+                name: "ACCEPT_PLAYER_SESSION",
+                playerSessionId,
+              })
+            );
+        }}
+      />
     </>
   );
 };
