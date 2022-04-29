@@ -7,4 +7,6 @@ const options =
       }
     : {};
 
-export const gamelift = new AWS.GameLift(options);
+const gamelift = new AWS.GameLift(options);
+
+export default gamelift;

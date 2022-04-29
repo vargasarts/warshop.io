@@ -1,21 +1,21 @@
-import createAPIGatewayProxyHandler from "aws-sdk-plus/dist/createAPIGatewayProxyHandler";
 import { BadRequestError } from "aws-sdk-plus/dist/errors";
-import { gamelift } from "../_common";
-import getFleetId from "../_common/getFleetId";
+import gamelift from "./gamelift.server";
+import getFleetId from "./getFleetId.server";
 
-const logic = ({
+const createGame = ({
   playerId,
-  isPrivate = 'false',
+  isPrivate = "false",
   password = "",
 }: {
   playerId: string;
   isPrivate?: string;
   password?: string;
 }) => {
+  console.log('player id', playerId, isPrivate, password);
   if (!playerId) {
     throw new BadRequestError("`playerId` is required");
   }
-  if (isPrivate === 'true' && !password) {
+  if (isPrivate === "true" && !password) {
     throw new BadRequestError("`password` is required for private matches");
   }
   return getFleetId()
@@ -47,5 +47,4 @@ const logic = ({
     }));
 };
 
-export const handler = createAPIGatewayProxyHandler(logic);
-export type Handler = typeof logic;
+export default createGame;

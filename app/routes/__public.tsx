@@ -1,3 +1,3 @@
-import PublicLayout from "@dvargas92495/ui/components/PublicLayout";
+import PublicLayout from "@dvargas92495/app/components/PublicLayout";
 
 export default PublicLayout;

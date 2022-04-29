@@ -24,8 +24,9 @@
   },
   "include": [
     "server",
-    "pages",
-    "functions"
+    "app",
+    "api",
+    "remix.env.d.ts"
   ],
   "exclude": [
     "node_modules",

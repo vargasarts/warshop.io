@@ -5,6 +5,7 @@ out
 .env
 _fuego
 .cache
+app/tailwind.css
 
 unity/Library
 unity/Temp

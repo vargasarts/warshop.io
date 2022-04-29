@@ -1,8 +1,7 @@
-import createAPIGatewayProxyHandler from "aws-sdk-plus/dist/createAPIGatewayProxyHandler";
-import { gamelift } from "../_common";
-import getFleetId from "../_common/getFleetId";
+import getFleetId from "./getFleetId.server";
+import gamelift from "./gamelift.server";
 
-const logic = () => {
+const getGames = () => {
   return getFleetId()
     .then((FleetId) => {
       return gamelift
@@ -26,5 +25,4 @@ const logic = () => {
     }));
 };
 
-export const handler = createAPIGatewayProxyHandler(logic);
-export type Handler = typeof logic;
+export default getGames;

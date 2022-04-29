@@ -1,8 +1,7 @@
-import createAPIGatewayProxyHandler from "aws-sdk-plus/dist/createAPIGatewayProxyHandler";
+import gamelift from "./gamelift.server";
 import { UnauthorizedError } from "aws-sdk-plus/dist/errors";
-import { gamelift } from "../_common";
 
-const logic = ({
+const joinGame = ({
   playerId,
   gameSessionId,
   password,
@@ -37,5 +36,4 @@ const logic = ({
       port: r.PlayerSession?.Port,
     }));
 
-export const handler = createAPIGatewayProxyHandler(logic);
-export type Handler = typeof logic;
+export default joinGame;

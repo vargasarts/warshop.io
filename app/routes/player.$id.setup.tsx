@@ -1,5 +1,5 @@
 import type { RobotStats } from "../../server/game";
-import Button from "@dvargas92495/ui/components/Button";
+import Button from "@dvargas92495/app/components/Button";
 const PLAYER_ID = "Web";
 
 const SetupScene = ({

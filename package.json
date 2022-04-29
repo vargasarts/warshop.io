@@ -34,7 +34,7 @@
     "concurrently": "^6.4.0",
     "esbuild": "^0.12.24",
     "eslint": "^7.32.0",
-    "fuegojs": "^0.25.8",
+    "fuegojs": "^0.26.9",
     "prettier": "^2.3.2",
     "tailwindcss": "^3.0.24",
     "tslint-config-prettier": "^1.18.0",
@@ -44,12 +44,10 @@
   "dependencies": {
     "@dplusic/gamelift-nodejs-serversdk": "0.0.1",
     "@dvargas92495/api": "^0.2.4",
-    "@dvargas92495/ui": "^0.53.6",
+    "@dvargas92495/app": "^0.0.3",
     "aws-sdk": "^2.981.0",
     "aws-sdk-plus": "^0.4.2",
     "axios": "^0.26.1",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
     "uuid": "^8.3.2",
     "ws": "^8.2.3"
   }

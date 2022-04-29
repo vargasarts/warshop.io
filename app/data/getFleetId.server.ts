@@ -1,4 +1,4 @@
-import { gamelift } from ".";
+import gamelift from "./gamelift.server";
 
 const getFleetId =
   process.env.NODE_ENV === "development"
