@@ -1,6 +1,9 @@
-import { useRef, useEffect, useState } from "react";
-import type { Command, Robot } from "../../server/game";
-import type { Map } from "../../server/map";
+import React, { useRef, useEffect, useState, useContext } from "react";
+import type { Command, Robot } from "../../../server/game";
+import WsContext from "../../contexts/WsContext";
+import loadMatch from "../../data/loadMatch.server";
+import { useLoaderData } from "@remix-run/react";
+import type { LoaderFunction } from "@remix-run/node";
 
 const RobotComponent = (r: Robot) => {
   return (
@@ -20,30 +23,28 @@ const RobotComponent = (r: Robot) => {
   );
 };
 
-const MatchScene = ({
-  myTeam = [],
-  opponentTeam = [],
-  isPrimary,
-  board,
-  opponentName,
-  ws,
-}: {
-  myTeam: Robot[];
-  opponentTeam: Robot[];
-  opponentName: string;
-  isPrimary: boolean;
-  board: Map;
-  ws: WebSocket;
-}): React.ReactElement => {
+const MatchScene = (): React.ReactElement => {
   const commands = useRef<Command[]>([]);
+  const { ws } = useContext(WsContext);
+  const {
+    myTeam = [],
+    opponentTeam = [],
+    isPrimary,
+    board,
+    opponentName,
+  } = useLoaderData<Awaited<ReturnType<typeof loadMatch>>>();
   useEffect(() => {
-    ws.onmessage = ({ data }) => {
-      const { name, props } = JSON.parse(data);
-      console.log(name, props);
-    };
-  }, []);
+    if (ws) {
+      ws.onmessage = ({ data }) => {
+        const { name, props } = JSON.parse(data);
+        console.log(name, props);
+      };
+    }
+  }, [ws]);
   const [command, setCommand] = useState<Record<string, string>>({});
-  return (
+  return !ws ? (
+    <div>No Web Socket Connected</div>
+  ) : (
     <div>
       <h1>
         Playing against {opponentName} as {`${isPrimary}`}
@@ -101,6 +102,10 @@ const MatchScene = ({
       <div>{JSON.stringify(board)}</div>
     </div>
   );
+};
+
+export const loader: LoaderFunction = ({ params }) => {
+  return loadMatch(params["id"] || "");
 };
 
 export default MatchScene;
