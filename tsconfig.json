@@ -1,13 +1,10 @@
 {
   "compilerOptions": {
-    "jsx": "react",
-    "target": "es2015",
+    "jsx": "react-jsx",
+    "target": "es2019",
     "allowJs": false,
-    "lib": [
-      "es2019",
-      "dom",
-      "dom.iterable"
-    ],
+    "baseUrl": ".",
+    "lib": ["es2019", "dom", "dom.iterable"],
     "module": "commonjs",
     "moduleResolution": "node",
     "declaration": true,
@@ -20,16 +17,15 @@
     "noImplicitThis": true,
     "noImplicitAny": true,
     "forceConsistentCasingInFileNames": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "noEmit": true,
+    "paths": {
+      "~/*": ["./app/*"]
+    }
   },
-  "include": [
-    "server",
-    "app",
-    "api",
-    "remix.env.d.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "**/__tests__/*"
-  ]
+  "include": ["remix.env.d.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules", "**/__tests__/*"]
 }
