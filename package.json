@@ -43,12 +43,7 @@
   },
   "dependencies": {
     "@dplusic/gamelift-nodejs-serversdk": "0.0.1",
-    "@dvargas92495/api": "^0.2.4",
-    "@dvargas92495/app": "^0.0.3",
-    "aws-sdk": "^2.981.0",
-    "aws-sdk-plus": "^0.4.2",
-    "axios": "^0.26.1",
-    "uuid": "^8.3.2",
+    "@dvargas92495/app": "^0.1.6",
     "ws": "^8.2.3"
   }
 }
