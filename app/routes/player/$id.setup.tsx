@@ -1,9 +1,10 @@
 import Button from "@dvargas92495/app/components/Button";
 import React, { useContext, useEffect, useState } from "react";
-import WsContext from "../../contexts/WsContext";
+import WsContext from "~/contexts/WsContext";
 import { useLoaderData, useNavigate } from "@remix-run/react";
 import type { LoaderFunction } from "@remix-run/node";
-import getPlayer from "../../data/getPlayer.server";
+import getPlayer from "~/data/getPlayer.server";
+import remixAppLoader from "@dvargas92495/app/backend/remixAppLoader.server";
 
 const PLAYER_ID = "Web";
 
@@ -63,8 +64,8 @@ const SetupScene = (): React.ReactElement => {
   );
 };
 
-export const loader: LoaderFunction = ({ params }) => {
-  return getPlayer(params["id"] || "");
+export const loader: LoaderFunction = (args) => {
+  return remixAppLoader(args, getPlayer);
 };
 
 export default SetupScene;
