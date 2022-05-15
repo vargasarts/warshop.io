@@ -112,7 +112,7 @@ resource "github_actions_secret" "clerk_api_key" {
 }
 
 resource "github_actions_secret" "mysql_password" {
-  repository       = "app"
+  repository       = "warshop.io"
   secret_name      = "MYSQL_PASSWORD"
   plaintext_value  = var.mysql_password
 }

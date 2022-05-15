@@ -3,7 +3,7 @@ import RemixRoot, {
   getRootMeta,
   RootCatchBoundary,
 } from "@dvargas92495/app/components/RemixRoot";
-import remixRootLoader from "@dvargas92495/app/utils/remixRootLoader.server";
+import remixRootLoader from "@dvargas92495/app/backend/remixRootLoader.server";
 import styles from "./tailwind.css";
 
 export const loader = remixRootLoader;
