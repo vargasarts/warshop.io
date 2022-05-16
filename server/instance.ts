@@ -6,7 +6,11 @@ import GameLiftServerAPI, {
 import { OnStartGameSessionDelegate } from "@dplusic/gamelift-nodejs-serversdk/dist/types/Server/ProcessParameters";
 import { createMap, NULL_VEC } from "./map";
 import { commandsToEvents, Command, Game, storeCommands } from "./game";
-import { getRobotRosterByPlayerId, getRobotByUuid } from "./db";
+import getRobotModel from "~/data/getRobotModel.server";
+import createRobotInstance from "~/data/createRobotInstance.server";
+import getRobot from "~/data/getRobot.server";
+import { NETWORK_ID_BY_NAME } from "~/enums/Networks";
+import dateFormat from "date-fns/format";
 
 const port = Number(process.argv[2]) || 12345;
 const MAX_BATTERY = 256;
@@ -56,6 +60,20 @@ const onProcessTerminate = () => {
   process.exit(0);
 };
 
+const mockRobotRoster = (playerId: string) =>
+  Promise.all(
+    Array.from({ length: 6 }, () =>
+      getRobotModel().then((robot) =>
+        createRobotInstance({
+          model: robot.uuid,
+          userId: playerId,
+          address: "Mock",
+          network: NETWORK_ID_BY_NAME["Mock"],
+          version: dateFormat(new Date(), "yyyy-MM-dd-hh-mm"),
+        }).then((uuid) => ({ ...robot, uuid }))
+      )
+    )
+  );
 const onAcceptPlayerSession = (
   {
     playerSessionId,
@@ -75,9 +93,7 @@ const onAcceptPlayerSession = (
         Limit: 1,
       })
         .then((p) =>
-          getRobotRosterByPlayerId(
-            p.Result?.PlayerSessions?.[0]?.PlayerId || ""
-          )
+          mockRobotRoster(p.Result?.PlayerSessions?.[0]?.PlayerId || "")
         )
         .then((myRoster) =>
           ws.send(JSON.stringify({ name: "LOAD_SETUP", myRoster }))
@@ -100,7 +116,7 @@ const onStartGame = (
   console.log("Client Starting Game");
 
   const isPrimary = !game.primary?.joined;
-  return Promise.all(myRobots.map(getRobotByUuid)).then((myRobots) => {
+  return Promise.all(myRobots.map(getRobot)).then((myRobots) => {
     const robots = myRobots.map((r) => {
       const robot = {
         ...r,
@@ -177,7 +193,7 @@ const onSubmitCommands = (
     storeCommands(game, p, commands);
     if (game.primary.ready && game.secondary.ready) {
       const eventJsons = commandsToEvents(game as Required<Game>);
-      const events = eventJsons.map(e => JSON.stringify(e));
+      const events = eventJsons.map((e) => JSON.stringify(e));
       game.primary.ws.send(
         JSON.stringify({
           name: "TURN_EVENTS",

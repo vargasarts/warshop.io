@@ -1,14 +1,6 @@
 import gamelift from "./gamelift.server";
 import getMysqlConnection from "@dvargas92495/app/backend/mysql.server";
-
-const getRobotModel = (uuid: string) => {
-  return Promise.resolve({
-    priority: 8,
-    health: 8,
-    attack: 8,
-    name: uuid,
-  });
-};
+import getRobotModel from "./getRobotModel.server";
 
 const getPlayer = ({
   userId,
@@ -25,16 +17,13 @@ const getPlayer = ({
       })
       .promise(),
     getMysqlConnection().then(({ execute, destroy }) =>
-      execute(`SELECT uuid, model_uuid FROM robot_instances WHERE user_id`, [
-        userId,
-      ]).then((records) => {
+      execute(
+        `SELECT uuid, model_uuid FROM robot_instances WHERE user_id = ?`,
+        [userId]
+      ).then((records) => {
         destroy();
         const instances = records as { uuid: string; model_uuid: string }[];
-        return Promise.all(
-          instances.map((r) =>
-            getRobotModel(r.model_uuid).then((m) => ({ uuid: r.uuid, ...m }))
-          )
-        );
+        return Promise.all(instances.map((r) => getRobotModel(r.model_uuid)));
       })
     ),
   ]).then(([r, myRoster]) => ({
