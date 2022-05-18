@@ -9,7 +9,7 @@ import { commandsToEvents, Command, Game, storeCommands } from "./game";
 import getRobotModel from "~/data/getRobotModel.server";
 import createRobotInstance from "~/data/createRobotInstance.server";
 import getRobot from "~/data/getRobot.server";
-import { NETWORK_ID_BY_NAME } from "~/enums/Networks";
+import { NETWORK_ID_BY_NAME } from "~/enums/networks";
 import dateFormat from "date-fns/format";
 
 const port = Number(process.argv[2]) || 12345;

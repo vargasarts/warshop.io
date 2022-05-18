@@ -1,6 +1,6 @@
 import React from "react";
 import { SignIn } from "@clerk/remix";
-import remixAuthedLoader from "@dvargas92495/app/utils/remixAuthedLoader.server";
+import remixAuthedLoader from "@dvargas92495/app/backend/remixAuthedLoader.server";
 import getMeta from "@dvargas92495/app/utils/getMeta";
 
 const LoginPage: React.FC = () => (

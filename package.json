@@ -10,6 +10,7 @@
     "format": "prettier --write \"**/*.tsx\"",
     "lint": "eslint . --ext .ts,.tsx",
     "api": "fuego api",
+    "postinstall": "fuego postinstall",
     "prebuild": "npm run generate:css -- --minify",
     "build": "fuego build",
     "deploy": "fuego deploy",
@@ -34,7 +35,7 @@
     "concurrently": "^6.4.0",
     "esbuild": "^0.12.24",
     "eslint": "^7.32.0",
-    "fuegojs": "^0.27.2",
+    "fuegojs": "^0.28.4",
     "prettier": "^2.3.2",
     "tailwindcss": "^3.0.24",
     "tslint-config-prettier": "^1.18.0",
@@ -43,7 +44,7 @@
   },
   "dependencies": {
     "@dplusic/gamelift-nodejs-serversdk": "0.0.1",
-    "@dvargas92495/app": "^0.1.6",
+    "@dvargas92495/app": "^0.3.5",
     "ws": "^8.2.3"
   }
 }

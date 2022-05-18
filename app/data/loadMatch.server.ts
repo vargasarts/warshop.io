@@ -1,6 +1,5 @@
-import type { Robot } from "../../server/game";
-import type { Map } from "../../server/map";
 import gamelift from "./gamelift.server";
+import getRobot from "./getRobot.server";
 
 const getBoardById = (id: string) =>
   Promise.resolve({
@@ -12,20 +11,9 @@ const getBoardById = (id: string) =>
     id,
   });
 
-const getTeamByPlayerAndGame = (_: {
-  playerId?: string;
-  gameSessionId?: string;
-}) => [];
-
 const loadMatch = (
   id: string
-): Promise<{
-  myTeam: Robot[];
-  opponentTeam: Robot[];
-  opponentName: string;
-  isPrimary: boolean;
-  board: Map;
-}> => {
+) => {
   return gamelift
     .describePlayerSessions({ PlayerSessionId: id })
     .promise()
@@ -39,9 +27,10 @@ const loadMatch = (
           GameSessionId: session.GameSessionId,
         })
         .promise()
-        .then((details) => ({ details, playerId: session.PlayerId }));
+        .then((details) => ({ details, session }));
     })
-    .then(async ({ details, playerId }) => {
+    .then(async ({ details, session }) => {
+      const playerId = session.PlayerId;
       if (!details.GameSessionDetails?.length) {
         throw new Error(`Could not find any game sessions with id ${id}`);
       }
@@ -60,7 +49,7 @@ const loadMatch = (
         .then((r) =>
           (r.PlayerSessions || []).map((p) => ({
             id: p.PlayerId,
-            data: p.PlayerData,
+            data: p.PlayerData || "",
           }))
         );
       const me = allPlayers.find((p) => p.id === playerId);
@@ -72,17 +61,36 @@ const loadMatch = (
         throw new Error("Failed to find opponent in game's player sessions");
       }
       return {
-        myTeam: await getTeamByPlayerAndGame({
-          playerId: me.id,
-          gameSessionId: GameSession.GameSessionId,
-        }),
-        opponentTeam: await getTeamByPlayerAndGame({
-          playerId: opponent.id,
-          gameSessionId: GameSession.GameSessionId,
-        }),
+        myTeam: await Promise.all(
+          me.data
+            .split(",")
+            .map((r) =>
+              getRobot(r).then((rob) => ({
+                ...rob,
+                id: 0,
+                position: {x:0, y:0},
+                startingHealth: rob.health,
+              }))
+            )
+        ),
+        opponentTeam: await Promise.all(
+          opponent.data
+            .split(",")
+            .map((r) =>
+              getRobot(r).then((rob) => ({
+                ...rob,
+                id: 0,
+                position: {x:0, y:0},
+                startingHealth: rob.health,
+              }))
+            )
+        ),
         opponentName: id,
         isPrimary: allPlayers[0].id === playerId,
         board: await getBoardById(properties["board"]),
+        ipAddress: session.IpAddress,
+        port: session.Port,
+        playerSessionId: id,
       };
     });
 };
