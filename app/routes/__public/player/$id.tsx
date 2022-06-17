@@ -4,6 +4,7 @@ import loadMatch from "~/data/loadMatch.server";
 import { useLoaderData } from "@remix-run/react";
 import type { LoaderFunction } from "@remix-run/node";
 import Button from "@dvargas92495/app/components/Button";
+import Loading from "@dvargas92495/app/components/Loading";
 
 /*
   useEffect(() => {
@@ -59,7 +60,7 @@ const MatchScene = (): React.ReactElement => {
         //...props
       } = JSON.parse(data);
       if (name === "GAME_READY") {
-        setLoading(true);
+        setLoading(false);
       }
     };
     instance.onopen = () =>
@@ -69,15 +70,13 @@ const MatchScene = (): React.ReactElement => {
           playerSessionId,
         })
       );
-    instance.onmessage = ({ data }) => {
-      const { name, props } = JSON.parse(data);
-      console.log(name, props);
-    };
     ws.current = instance;
   }, [ws]);
   const [command, setCommand] = useState<Record<string, string>>({});
   return loading ? (
-    <div>Loading...</div>
+    <div>
+      <Loading />
+    </div>
   ) : (
     <div>
       <h1>
