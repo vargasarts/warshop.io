@@ -76,7 +76,7 @@ export const loader: LoaderFunction = (args) => {
 export const action: ActionFunction = async (args) => {
   return remixAppAction(args, ({ method, userId, data }) => {
     if (method === "POST") {
-      const gameSessionId = data["gameSessionId"]?.[0];
+      const gameSessionId = data["gameSessionId"]?.[0] || '';
 
       return gameSessionId
         ? createGame({ playerId: userId, isPrivate: "false", password: "" })
