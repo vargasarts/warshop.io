@@ -16,14 +16,11 @@ type GameViews = Awaited<ReturnType<typeof getGames>>["gameViews"];
 
 const GameSession = (g: GameViews[number]) => {
   return (
-    <div className="flex justify-between p-4 items-center">
-      <span />
-      <input
-        name={"gameSessionId"}
-        defaultValue={g.gameSessionId}
-        type={"hidden"}
-      />
-      <span>{g.creatorId}</span>
+    <div className="flex justify-between px-4 pt-4 border border-gray-300 gap-4 last:rounded-b-md">
+      <span className={"flex flex-col"}>
+        <span className={"text-sm"}>{g.creatorId}</span>
+        <span className={"text-xs"}>{g.gameSessionId}</span>
+      </span>
       {g.isPrivate && <BaseInput placeholder="password" type={"password"} />}
       <BaseInput
         type={"radio"}
@@ -60,7 +57,12 @@ const PlayerPage = (): React.ReactElement => {
           ))}
           <h1 className="mb-4 text-3xl font-bold mt-8">Pick your Team</h1>
           {roster.map((r) => (
-            <Checkbox name={"robot"} value={r.uuid} label={r.name} />
+            <Checkbox
+              name={"robot"}
+              value={r.uuid}
+              label={r.name}
+              key={r.uuid}
+            />
           ))}
         </div>
         <Button className="my-8">{isNewGame ? "Create" : "Join"}</Button>
@@ -76,15 +78,23 @@ export const loader: LoaderFunction = (args) => {
 export const action: ActionFunction = async (args) => {
   return remixAppAction(args, ({ method, userId, data }) => {
     if (method === "POST") {
-      const gameSessionId = data["gameSessionId"]?.[0] || '';
+      const gameSessionId = data["gameSessionId"]?.[0] || "";
+      const team = data["robot"] || [];
 
-      return gameSessionId
-        ? createGame({ playerId: userId, isPrivate: "false", password: "" })
-        : joinGame({
-            playerId: userId,
-            gameSessionId,
-            password: "",
-          }).then((res) => redirect(`/player/${res.playerSessionId}/setup`));
+      return (
+        gameSessionId === "new"
+          ? createGame({
+              playerId: userId,
+              isPrivate: "false",
+              password: "",
+              team,
+            })
+          : joinGame({
+              playerId: userId,
+              gameSessionId,
+              password: "",
+            })
+      ).then((res) => redirect(`/player/${res.playerSessionId}`));
     } else throw new Response(`Method ${method} Not Found`, { status: 404 });
   });
 };

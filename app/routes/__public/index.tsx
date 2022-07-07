@@ -3,6 +3,8 @@ import Landing, {
   Showcase,
 } from "@dvargas92495/app/components/Landing";
 
+export const handle = Landing.handle;
+
 export default () => (
   <Landing>
     <Splash

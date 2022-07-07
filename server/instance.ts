@@ -6,11 +6,7 @@ import GameLiftServerAPI, {
 import { OnStartGameSessionDelegate } from "@dplusic/gamelift-nodejs-serversdk/dist/types/Server/ProcessParameters";
 import { createMap, NULL_VEC } from "./map";
 import { commandsToEvents, Command, Game, storeCommands } from "./game";
-import getRobotModel from "~/data/getRobotModel.server";
-import createRobotInstance from "~/data/createRobotInstance.server";
 import getRobot from "~/data/getRobot.server";
-import { NETWORK_ID_BY_NAME } from "~/enums/networks";
-import dateFormat from "date-fns/format";
 
 const port = Number(process.argv[2]) || 12345;
 const MAX_BATTERY = 256;
@@ -55,51 +51,10 @@ const onHealthCheck = (): boolean => {
 };
 
 const onProcessTerminate = () => {
+  console.log("IM THE TERMINATOR");
   GameLiftServerAPI.ProcessEnding();
   GameLiftServerAPI.Destroy();
   process.exit(0);
-};
-
-const mockRobotRoster = (playerId: string) =>
-  Promise.all(
-    Array.from({ length: 6 }, () =>
-      getRobotModel().then((robot) =>
-        createRobotInstance({
-          model: robot.uuid,
-          userId: playerId,
-          address: "Mock",
-          network: NETWORK_ID_BY_NAME["Mock"],
-          version: dateFormat(new Date(), "yyyy-MM-dd-hh-mm"),
-        }).then((uuid) => ({ ...robot, uuid }))
-      )
-    )
-  );
-const onAcceptPlayerSession = (
-  {
-    playerSessionId,
-  }: {
-    playerSessionId: string;
-  },
-  ws: WebSocket
-) => {
-  return GameLiftServerAPI.AcceptPlayerSession(playerSessionId).then(
-    (outcome) => {
-      if (!outcome.Success) {
-        console.error(outcome);
-        return;
-      }
-      GameLiftServerAPI.DescribePlayerSessions({
-        PlayerSessionId: playerSessionId,
-        Limit: 1,
-      })
-        .then((p) =>
-          mockRobotRoster(p.Result?.PlayerSessions?.[0]?.PlayerId || "")
-        )
-        .then((myRoster) =>
-          ws.send(JSON.stringify({ name: "LOAD_SETUP", myRoster }))
-        );
-    }
-  );
 };
 
 const onStartGame = (
@@ -141,6 +96,7 @@ const onStartGame = (
       game.secondary = player;
     }
     if (game.primary?.joined && game.secondary?.joined) {
+      console.log("ready");
       const commonProps = {
         name: "GAME_READY",
         board: {
@@ -166,8 +122,42 @@ const onStartGame = (
           opponentTeam: game.primary.team,
         })
       );
+    } else {
+      console.log("waitin");
     }
   });
+};
+
+const onAcceptPlayerSession = (
+  {
+    playerSessionId,
+  }: {
+    playerSessionId: string;
+  },
+  ws: WebSocket,
+  game: Game
+) => {
+  return GameLiftServerAPI.AcceptPlayerSession(playerSessionId).then(
+    (outcome) => {
+      if (!outcome.Success) {
+        console.error(outcome);
+        return;
+      }
+      GameLiftServerAPI.DescribePlayerSessions({
+        PlayerSessionId: playerSessionId,
+        Limit: 1,
+      }).then((p) =>
+        onStartGame(
+          {
+            myName: p.Result?.PlayerSessions[0].PlayerId || "",
+            myRobots: p.Result?.PlayerSessions[0].PlayerData?.split(",") || [],
+          },
+          ws,
+          game
+        )
+      );
+    }
+  );
 };
 
 const onSubmitCommands = (
@@ -243,7 +233,6 @@ console.log(`Starting the server at port: ${port}`);
 const outcome = GameLiftServerAPI.InitSDK();
 const MESSAGE_HANDLERS = {
   ACCEPT_PLAYER_SESSION: onAcceptPlayerSession,
-  START_GAME: onStartGame,
   SUBMIT_COMMANDS: onSubmitCommands,
 } as const;
 

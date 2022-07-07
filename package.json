@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@dplusic/gamelift-nodejs-serversdk": "0.0.1",
-    "@dvargas92495/app": "^0.9.7",
+    "@dvargas92495/app": "^0.9.8",
     "ws": "^8.2.3"
   }
 }

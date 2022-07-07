@@ -6,12 +6,12 @@ const createGame = ({
   playerId,
   isPrivate = "false",
   password = "",
-  team = [],
+  team,
 }: {
   playerId: string;
   isPrivate?: string;
   password?: string;
-  team?: string[];
+  team: string[];
 }) => {
   if (!playerId) {
     throw new BadRequestError("`playerId` is required");

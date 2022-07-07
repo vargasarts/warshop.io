@@ -8,7 +8,11 @@ const getRobotRoster = (userId: string) =>
     ]).then((records) => {
       destroy();
       const instances = records as { uuid: string; model_uuid: string }[];
-      return Promise.all(instances.map((r) => getRobotModel(r.model_uuid)));
+      return Promise.all(
+        instances.map((r) =>
+          getRobotModel(r.model_uuid).then((rm) => ({ ...rm, ...r }))
+        )
+      );
     })
   );
 

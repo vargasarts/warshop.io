@@ -1,4 +1,6 @@
 const esbuild = require("esbuild");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const IGNORE_ENV = ["HOME"];
 const getDotEnvObject = () => {
