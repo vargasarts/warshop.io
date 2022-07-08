@@ -5,10 +5,12 @@ const joinGame = ({
   playerId,
   gameSessionId,
   password,
+  team,
 }: {
   playerId: string;
   gameSessionId: string;
   password: string;
+  team: string[];
 }) =>
   gamelift
     .describeGameSessions({ GameSessionId: gameSessionId })
@@ -27,6 +29,7 @@ const joinGame = ({
         .createPlayerSession({
           PlayerId: playerId,
           GameSessionId: gameSessionId,
+          PlayerData: team.join(","),
         })
         .promise();
     })

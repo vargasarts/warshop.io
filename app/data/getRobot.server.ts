@@ -11,7 +11,7 @@ const getRobotByUuid = (uuid: string): Promise<RobotStats> =>
       const [robotModel] = records as { model_uuid: string }[];
       if (!robotModel)
         return Promise.reject(
-          `Could not find robot model from instance ${uuid}`
+          new Error(`Could not find robot model from instance ${uuid}`)
         );
       return getRobotModel(robotModel.model_uuid);
     })

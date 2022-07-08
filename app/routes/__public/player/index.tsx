@@ -11,6 +11,7 @@ import remixAppAction from "@dvargas92495/app/backend/remixAppAction.server";
 import remixAppLoader from "@dvargas92495/app/backend/remixAppLoader.server";
 export { default as CatchBoundary } from "@dvargas92495/app/components/DefaultCatchBoundary";
 export { default as ErrorBoundary } from "@dvargas92495/app/components/DefaultErrorBoundary";
+import { BadRequestResponse } from "@dvargas92495/app/backend/responses.server";
 
 type GameViews = Awaited<ReturnType<typeof getGames>>["gameViews"];
 
@@ -80,6 +81,11 @@ export const action: ActionFunction = async (args) => {
     if (method === "POST") {
       const gameSessionId = data["gameSessionId"]?.[0] || "";
       const team = data["robot"] || [];
+      if (team.length < 4) {
+        throw new BadRequestResponse(
+          `Must have a minimum of 4 Robots to youor team.`
+        );
+      }
 
       return (
         gameSessionId === "new"
@@ -93,6 +99,7 @@ export const action: ActionFunction = async (args) => {
               playerId: userId,
               gameSessionId,
               password: "",
+              team,
             })
       ).then((res) => redirect(`/player/${res.playerSessionId}`));
     } else throw new Response(`Method ${method} Not Found`, { status: 404 });

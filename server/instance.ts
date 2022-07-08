@@ -4,26 +4,36 @@ import GameLiftServerAPI, {
   ProcessParameters,
 } from "@dplusic/gamelift-nodejs-serversdk";
 import { OnStartGameSessionDelegate } from "@dplusic/gamelift-nodejs-serversdk/dist/types/Server/ProcessParameters";
-import { createMap, NULL_VEC } from "./map";
+import { NULL_VEC } from "./map";
 import { commandsToEvents, Command, Game, storeCommands } from "./game";
 import getRobot from "~/data/getRobot.server";
+import getBoardById from "~/data/getBoardById.server";
 
 const port = Number(process.argv[2]) || 12345;
 const MAX_BATTERY = 256;
-const boardFile =
-  "8 5\nA W W W W W W a\nB W W W W W W b\nW P W W W W p W\nC W W W W W W c\nD W W W W W W d";
 const game: Game = {
   healthChecks: 0,
-  board: createMap(boardFile),
   gameSessionId: "",
   nextRobotId: 0,
   turn: 0,
   history: {},
+  board: {
+    spaces: [],
+    height: 0,
+    width: 0,
+    primaryDock: new Set(),
+    secondaryDock: new Set(),
+  },
 };
 
 const onGameSession: OnStartGameSessionDelegate = (gameSession) => {
   game.gameSessionId = gameSession.GameSessionId || "";
-  GameLiftServerAPI.ActivateGameSession();
+  getBoardById(
+    gameSession.GameProperties.find((p) => p.Key === "board")?.Value || ""
+  ).then((board) => {
+    game.board = board;
+    GameLiftServerAPI.ActivateGameSession();
+  });
 };
 
 const onUpdateGameSession = () => {
@@ -68,64 +78,63 @@ const onStartGame = (
   ws: WebSocket,
   game: Game
 ) => {
-  console.log("Client Starting Game");
+  console.log(
+    "Client",
+    myName,
+    "Starting Game With Team",
+    JSON.stringify(myRobots, null, 4)
+  );
 
   const isPrimary = !game.primary?.joined;
-  return Promise.all(myRobots.map(getRobot)).then((myRobots) => {
-    const robots = myRobots.map((r) => {
-      const robot = {
-        ...r,
-        id: game.nextRobotId++,
-        position: NULL_VEC,
-        startingHealth: r.health,
+  return Promise.all(myRobots.map(getRobot))
+    .then((myRobots) => {
+      const robots = myRobots.map((r) => {
+        const robot = {
+          ...r,
+          id: game.nextRobotId++,
+          position: NULL_VEC,
+          startingHealth: r.health,
+        };
+        // game.board add to dock
+        return robot;
+      });
+      const player = {
+        name: myName,
+        joined: true,
+        ready: false,
+        ws,
+        team: robots,
+        battery: MAX_BATTERY,
       };
-      // game.board add to dock
-      return robot;
-    });
-    const player = {
-      name: myName,
-      joined: true,
-      ready: false,
-      ws,
-      team: robots,
-      battery: MAX_BATTERY,
-    };
-    if (isPrimary) {
-      game.primary = player;
-    } else {
-      game.secondary = player;
-    }
-    if (game.primary?.joined && game.secondary?.joined) {
-      console.log("ready");
-      const commonProps = {
-        name: "GAME_READY",
-        board: {
-          ...game.board,
-          spaces: game.board.spaces.map((s) => JSON.stringify(s)),
-        },
-      };
-      game.primary.ws.send(
-        JSON.stringify({
-          ...commonProps,
-          isPrimary: true,
-          opponentName: game.secondary.name,
-          myTeam: game.primary.team,
-          opponentTeam: game.secondary.team,
-        })
-      );
-      game.secondary.ws.send(
-        JSON.stringify({
-          ...commonProps,
-          isPrimary: false,
-          opponentName: game.primary.name,
-          myTeam: game.secondary.team,
-          opponentTeam: game.primary.team,
-        })
-      );
-    } else {
-      console.log("waitin");
-    }
-  });
+      if (isPrimary) {
+        game.primary = player;
+      } else {
+        game.secondary = player;
+      }
+      if (game.primary?.joined && game.secondary?.joined) {
+        game.primary.ws.send(
+          JSON.stringify({
+            name: "GAME_READY",
+            isPrimary: true,
+            opponentName: game.secondary.name,
+            myTeam: game.primary.team,
+            opponentTeam: game.secondary.team,
+          })
+        );
+        game.secondary.ws.send(
+          JSON.stringify({
+            name: "GAME_READY",
+            isPrimary: false,
+            opponentName: game.primary.name,
+            myTeam: game.secondary.team,
+            opponentTeam: game.primary.team,
+          })
+        );
+      }
+    })
+    .catch((e) =>
+      ws.send(JSON.stringify({ name: "ERROR", message: e.message }))
+    );
 };
 
 const onAcceptPlayerSession = (
@@ -137,6 +146,15 @@ const onAcceptPlayerSession = (
   ws: WebSocket,
   game: Game
 ) => {
+  if (game.primary?.joined && game.secondary?.joined) {
+    ws.send(
+      JSON.stringify({
+        name: "RESUME_GAME",
+        // current game state
+      })
+    );
+    return;
+  }
   return GameLiftServerAPI.AcceptPlayerSession(playerSessionId).then(
     (outcome) => {
       if (!outcome.Success) {

@@ -1,13 +1,12 @@
 import {
   BatterySpace,
-  BATTERY_SPACE_ID,
   Map,
   NULL_VEC,
   QueueSpace,
-  QUEUE_SPACE_ID,
   Space,
 } from "./map";
 import { WebSocket } from "ws";
+import { QUEUE_SPACE_ID, BATTERY_SPACE_ID } from "~/enums/spaces";
 
 type Position = {
   x: number;
