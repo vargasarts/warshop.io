@@ -1,4 +1,4 @@
-import { BadRequestError } from "aws-sdk-plus/dist/errors";
+import { BadRequestError } from "@dvargas92495/app/backend/errors.server";
 import gamelift from "./gamelift.server";
 import getFleetId from "./getFleetId.server";
 

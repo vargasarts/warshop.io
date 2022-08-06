@@ -1,4 +1,4 @@
-import createAPIGatewayProxyHandler from "aws-sdk-plus/dist/createAPIGatewayProxyHandler";
-import joinGame from "../../app/data/joinGame.server";
+import createAPIGatewayProxyHandler from "@dvargas92495/app/backend/createAPIGatewayProxyHandler.server";
+import joinGame from "~/data/joinGame.server";
 
 export const handler = createAPIGatewayProxyHandler(joinGame);

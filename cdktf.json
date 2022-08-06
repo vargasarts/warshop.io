@@ -1,0 +1,11 @@
+{
+  "language": "typescript",
+  "app": "npx ts-node-esm data/main.ts",
+  "projectId": "warshop",
+  "sendCrashReports": "false",
+  "context": {
+    "excludeStackIdFromLogicalIds": "true",
+    "allowSepCharsInLogicalIds": "true"
+  },
+  "output": "node_modules/cdktf.out"
+}

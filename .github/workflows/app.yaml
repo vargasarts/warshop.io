@@ -4,9 +4,8 @@ on:
   push:
     branches: main
     paths:
-      - "package.json"
       - "app/**"
-      - ".github/workflows/main.yaml"
+      - ".github/workflows/app.yaml"
 
 env:
   API_URL: api.warshop.io
@@ -17,7 +16,7 @@ env:
   CLERK_FRONTEND_API: clerk.warshop.io
   DATABASE_URL: mysql://warshop_io:${{ secrets.MYSQL_PASSWORD }}@vargas-arts.c2sjnb5f4d57.us-east-1.rds.amazonaws.com:5432/washop_io
   IS_PRODUCTION: 1
-  ORIGIN: https://app.davidvargas.me
+  ORIGIN: https://warshop.io
   STRIPE_PUBLIC_KEY: ${{ secrets.STRIPE_PUBLIC_KEY }}
   STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
 
@@ -26,10 +25,6 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js 16
-        uses: actions/setup-node@v1
-        with:
-          node-version: 16.14.0
       - name: install
         run: npm install
       - name: build

@@ -1,5 +1,5 @@
 import gamelift from "./gamelift.server";
-import { UnauthorizedError } from "aws-sdk-plus/dist/errors";
+import { UnauthorizedError } from "@dvargas92495/app/backend/errors.server";
 
 const joinGame = ({
   playerId,
